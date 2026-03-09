@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // Configure default axios instance
 const apiClient = axios.create({
-    baseURL: '/api',
+    baseURL: import.meta.env.VITE_API_BASE_URL ? `${import.meta.env.VITE_API_BASE_URL}/api` : '/api',
     withCredentials: true, // Important for sending cookies/session with requests cross-origin
     headers: {
         'Content-Type': 'application/json',
@@ -141,7 +141,8 @@ export const sectionsAPI = {
 export const reportsAPI = {
     generateReport: () => {
         // Trigger direct browser download
-        window.location.href = '/api/reports/generate';
+        const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
+        window.location.href = `${baseUrl}/api/reports/generate`;
     }
 };
 
