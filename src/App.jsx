@@ -14,6 +14,7 @@ import TransactionsHistory from './pages/TransactionsHistory';
 import Profile from './pages/Profile';
 import AIAssistant from './pages/AIAssistant';
 import Reports from './pages/Reports';
+import ReportDownload from './pages/ReportDownload';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -52,6 +53,7 @@ function AppRoutes() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/ai-assistant" element={<AIAssistant />} />
         <Route path="/reports" element={<Reports />} />
+        <Route path="/reports/download" element={<ReportDownload />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>

@@ -1,5 +1,4 @@
-import React, { useState } from 'react';
-import { reportsAPI } from '../api/client';
+import React from 'react';
 import Card from '../components/Card';
 import Button from '../components/Button';
 import { FileText, Download, TrendingUp, Filter, Calendar, ArrowLeft } from 'lucide-react';
@@ -7,15 +6,9 @@ import { useNavigate } from 'react-router-dom';
 
 const Reports = () => {
     const navigate = useNavigate();
-    const [isGenerating, setIsGenerating] = useState(false);
 
     const handleGenerateReport = () => {
-        setIsGenerating(true);
-        reportsAPI.generateReport()
-            .catch((error) => {
-                console.error("Failed to generate report", error);
-            })
-            .finally(() => setIsGenerating(false));
+        navigate('/reports/download');
     };
 
     return (
@@ -57,7 +50,6 @@ const Reports = () => {
 
                     <Button
                         onClick={handleGenerateReport}
-                        disabled={isGenerating}
                         style={{
                             backgroundColor: 'white',
                             color: 'var(--primary-dark)',
@@ -71,14 +63,10 @@ const Reports = () => {
                             boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
                         }}
                     >
-                        {isGenerating ? (
-                            <>Generating...</>
-                        ) : (
-                            <>
-                                <Download size={20} />
-                                Download PDF Report
-                            </>
-                        )}
+                        <>
+                            <Download size={20} />
+                            Download PDF Report
+                        </>
                     </Button>
                 </div>
             </Card>
