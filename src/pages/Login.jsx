@@ -82,7 +82,7 @@ const Login = () => {
                     </p>
 
                     <div style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
-                        {['📊 Real-time financial tracking', '🌿 Multi-area farm management', '🤖 AI-powered farming tips'].map(f => (
+                        {['Real-time financial tracking', 'Multi-area farm management', 'AI-powered farming tips'].map(f => (
                             <div key={f} style={{
                                 background: 'rgba(255,255,255,0.12)',
                                 borderRadius: '12px',

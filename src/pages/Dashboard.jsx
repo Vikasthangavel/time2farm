@@ -218,7 +218,9 @@ const Dashboard = () => {
 
                 {recentActs.length === 0 ? (
                     <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
-                        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🌱</div>
+                        <div style={{ width: 40, height: 40, borderRadius: '10px', background: 'var(--primary-100)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 0.75rem' }}>
+                            <History size={20} color="var(--primary-color)" />
+                        </div>
                         <p className="text-muted">No transactions yet. Record a sale or expense to get started!</p>
                     </div>
                 ) : (

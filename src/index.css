@@ -243,41 +243,29 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
    RESPONSIVE: DESKTOP LAYOUT
    ============================================= */
 @media (min-width: 768px) {
-  /* App shell becomes a sidebar layout */
+  /* App shell — flex row, sidebar is fixed so no space allocation needed here */
   .app-shell {
-    display: flex;
-    flex-direction: row;
+    display: block;
     min-height: 100vh;
   }
 
-  /* Sidebar */
+  /* Sidebar is fixed — styles set inline in component */
   .sidebar {
-    width: var(--sidebar-width);
-    min-height: 100vh;
-    position: sticky;
-    top: 0;
-    flex-shrink: 0;
-    background: var(--bg-sidebar);
-    border-right: 1px solid var(--border-color);
-    display: flex;
-    flex-direction: column;
+    display: flex !important;
   }
 
-  /* Main content area */
+  /* Main content: offset by sidebar width so it's not hidden behind fixed sidebar */
   .main-content {
-    flex: 1;
+    margin-left: var(--sidebar-width);
     min-width: 0;
     padding: 2rem;
-    max-width: 900px;
-    margin: 0 auto;
+    max-width: calc(900px + var(--sidebar-width));
     width: 100%;
+    box-sizing: border-box;
   }
 
   /* Hide bottom nav on desktop */
   .bottom-nav { display: none !important; }
-
-  /* Show sidebar on desktop */
-  .sidebar { display: flex !important; }
 
   /* Content grid enhancements */
   .metrics-row {
@@ -298,7 +286,6 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
 
 @media (min-width: 1200px) {
   .main-content {
-    max-width: 1024px;
     padding: 2rem 3rem;
   }
 }
@@ -307,10 +294,12 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
    MOBILE ONLY
    ============================================= */
 @media (max-width: 767px) {
-  .sidebar { display: none; }
+  /* Hide fixed sidebar on mobile */
+  .sidebar { display: none !important; }
   .bottom-nav { display: flex !important; }
 
   .main-content {
+    margin-left: 0;
     padding: 1rem;
     padding-bottom: 80px; /* space for bottom nav */
   }

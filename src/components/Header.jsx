@@ -69,7 +69,7 @@ const Header = () => {
                             lineHeight: 1.2,
                             marginBottom: '1rem',
                         }}>
-                            {user?.full_name?.split(' ')[0] || 'Farmer'} 👨‍🌾
+                            {user?.full_name?.split(' ')[0] || 'Farmer'}
                         </h1>
 
                         <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>

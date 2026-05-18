@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Home, PlusCircle, LineChart, User, Sprout, Menu, X } from 'lucide-react';
+import { Home, PlusCircle, LineChart, User, Sprout, LogOut } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 import ChatWidget from './ChatWidget';
 
 const navItems = [
@@ -14,6 +15,7 @@ const navItems = [
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const { logout } = useAuth();
 
     const isActive = (item) =>
         location.pathname === item.path ||
@@ -21,11 +23,23 @@ const Sidebar = () => {
             (location.pathname.includes('/add-expense') ||
              location.pathname.includes('/record-sale')));
 
+    const handleLogout = async () => {
+        await logout();
+        navigate('/login');
+    };
+
     return (
         <aside className="sidebar" style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            height: '100vh',
+            width: 'var(--sidebar-width)',
             display: 'flex',
             flexDirection: 'column',
-            padding: '0',
+            backgroundColor: 'var(--bg-sidebar)',
+            borderRight: '1px solid var(--border-color)',
+            zIndex: 200,
         }}>
             {/* Brand */}
             <div style={{
@@ -55,7 +69,7 @@ const Sidebar = () => {
             </div>
 
             {/* Nav links */}
-            <nav style={{ padding: '1rem 0.75rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+            <nav style={{ padding: '1rem 0.75rem', flex: 1, display: 'flex', flexDirection: 'column', gap: '4px', overflowY: 'auto' }}>
                 {navItems.map((item) => {
                     const active = isActive(item);
                     const Icon = item.icon;
@@ -97,14 +111,35 @@ const Sidebar = () => {
                 })}
             </nav>
 
-            {/* Footer hint */}
+            {/* Logout button at bottom */}
             <div style={{
-                padding: '1rem 1.25rem',
+                padding: '1rem 0.75rem',
                 borderTop: '1px solid var(--border-color)',
-                fontSize: '0.75rem',
-                color: 'var(--text-muted)',
             }}>
-                🌱 Smart Farming Companion
+                <button
+                    onClick={handleLogout}
+                    style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        padding: '0.625rem 0.875rem',
+                        borderRadius: 'var(--border-radius)',
+                        background: 'transparent',
+                        color: 'var(--accent-red)',
+                        border: 'none',
+                        cursor: 'pointer',
+                        fontWeight: '500',
+                        fontSize: '0.9rem',
+                        transition: 'all 0.15s',
+                        width: '100%',
+                        textAlign: 'left',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = 'var(--accent-red-light)'; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; }}
+                >
+                    <LogOut size={18} />
+                    Logout
+                </button>
             </div>
         </aside>
     );
@@ -182,6 +217,7 @@ const Layout = () => {
         <div className="app-shell" style={{ minHeight: '100vh', display: 'flex' }}>
             <Sidebar />
 
+            {/* Offset main content by sidebar width on desktop */}
             <div className="main-content" style={{ flex: 1 }}>
                 <Outlet />
             </div>
