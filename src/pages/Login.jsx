@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Button from '../components/Button';
 import { Eye, EyeOff } from 'lucide-react';
+import './Login.css';
 
 const Login = () => {
     const [username, setUsername] = useState('');
@@ -34,25 +35,9 @@ const Login = () => {
     };
 
     return (
-        <div style={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'stretch',
-            backgroundColor: 'var(--bg-main)',
-        }}>
+        <div className="login-container">
             {/* Left decorative panel — shown on desktop */}
-            <div style={{
-                flex: '0 0 45%',
-                background: 'linear-gradient(160deg, #4a9e3f 0%, #2d6a27 50%, #1e4d1b 100%)',
-                display: 'none',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: '3rem',
-                color: 'white',
-                position: 'relative',
-                overflow: 'hidden',
-            }} className="login-panel">
+            <div className="login-panel">
                 <style>{`
                     @media (min-width: 768px) {
                         .login-panel { display: flex !important; }
@@ -64,73 +49,36 @@ const Login = () => {
                 <div style={{ position: 'absolute', bottom: -40, right: -40, width: 180, height: 180, borderRadius: '50%', background: 'rgba(255,255,255,0.07)' }} />
                 <div style={{ position: 'absolute', top: '40%', right: -30, width: 100, height: 100, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
 
-                <div style={{ position: 'relative', zIndex: 1, textAlign: 'center', maxWidth: 320 }}>
-                    <div style={{
-                        width: 80, height: 80,
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        margin: '0 auto 1.5rem',
-                    }}>
-                        <img src="/logo.png" alt="Time2Farm" style={{ width: 80, height: 80, objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                <div className="login-panel-inner">
+                    <div className="login-panel-logo">
+                        <img src="/logo.png" alt="Time2Farm" />
                     </div>
-                    <h1 style={{ fontSize: '2.25rem', fontWeight: 800, marginBottom: '0.75rem', color: 'white' }}>
-                        Time2Farm
-                    </h1>
-                    <p style={{ fontSize: '1rem', opacity: 0.85, lineHeight: 1.7 }}>
-                        Your smart farming companion. Track sales, manage expenses, and grow your farm's profitability.
-                    </p>
+                    <h1 className="login-panel-title">Time2Farm</h1>
+                    <p className="login-panel-sub">Your smart farming companion. Track sales, manage expenses, and grow your farm's profitability.</p>
 
-                    <div style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div className="login-panel-features">
                         {['Real-time financial tracking', 'Multi-area farm management', 'AI-powered farming tips'].map(f => (
-                            <div key={f} style={{
-                                background: 'rgba(255,255,255,0.12)',
-                                borderRadius: '12px',
-                                padding: '0.75rem 1rem',
-                                fontSize: '0.875rem',
-                                textAlign: 'left',
-                                backdropFilter: 'blur(4px)',
-                            }}>{f}</div>
+                            <div key={f} className="feature-item">{f}</div>
                         ))}
                     </div>
                 </div>
             </div>
 
             {/* Right form panel */}
-            <div style={{
-                flex: 1,
-                display: 'flex',
-                flexDirection: 'column',
-                justifyContent: 'center',
-                alignItems: 'center',
-                padding: 'clamp(1.5rem, 5vw, 3rem)',
-            }}>
-                <div style={{ width: '100%', maxWidth: 400 }}>
+            <div className="login-form-panel">
+                <div className="login-card">
                     {/* Mobile logo */}
-                    <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                        <img src="/logo.png" alt="Time2Farm" style={{ width: 56, height: 56, objectFit: 'contain', margin: '0 auto 0.75rem', display: 'block' }} />
-                        <h1 style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--text-dark)' }}>
-                            Welcome back
-                        </h1>
-                        <p className="text-muted" style={{ marginTop: '0.25rem' }}>
-                            Sign in to your Time2Farm account
-                        </p>
+                    <div className="login-logo">
+                        <img src="/logo.png" alt="Time2Farm" />
+                        <h1 className="login-title">Welcome back</h1>
+                        <p className="login-subtitle">Sign in to your Time2Farm account</p>
                     </div>
 
                     {error && (
-                        <div style={{
-                            backgroundColor: 'var(--accent-red-light)',
-                            color: '#b91c1c',
-                            padding: '0.75rem 1rem',
-                            borderRadius: 'var(--border-radius)',
-                            marginBottom: '1.25rem',
-                            fontSize: '0.875rem',
-                            borderLeft: '3px solid var(--accent-red)',
-                        }}>
-                            {error}
-                        </div>
+                        <div className="error-box">{error}</div>
                     )}
-
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
-                        <div>
+                    <form onSubmit={handleSubmit} className="login-form">
+                        <div className="form-group">
                             <label>Username</label>
                             <input
                                 type="text"
@@ -142,25 +90,20 @@ const Login = () => {
                             />
                         </div>
 
-                        <div>
+                        <div className="form-group">
                             <label>Password</label>
-                            <div style={{ position: 'relative' }}>
+                            <div className="password-wrapper">
                                 <input
                                     type={showPw ? 'text' : 'password'}
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
                                     placeholder="Enter your password"
                                     required
-                                    style={{ paddingRight: '2.75rem' }}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPw(!showPw)}
-                                    style={{
-                                        position: 'absolute', right: 10, top: '50%', transform: 'translateY(-50%)',
-                                        background: 'none', border: 'none', color: 'var(--text-muted)',
-                                        cursor: 'pointer', padding: 4,
-                                    }}
+                                    className="password-toggle"
                                 >
                                     {showPw ? <EyeOff size={16} /> : <Eye size={16} />}
                                 </button>
@@ -177,14 +120,9 @@ const Login = () => {
                         </Button>
                     </form>
 
-                    <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: 'var(--text-muted)' }}>
+                    <p className="register-cta">
                         Don't have an account?{' '}
-                        <span
-                            onClick={() => navigate('/register')}
-                            style={{ color: 'var(--primary-color)', fontWeight: 600, cursor: 'pointer' }}
-                        >
-                            Create account
-                        </span>
+                        <span onClick={() => navigate('/register')} className="register-link">Create account</span>
                     </p>
                 </div>
             </div>
