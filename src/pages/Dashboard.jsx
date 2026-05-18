@@ -5,49 +5,91 @@ import { dashboardAPI } from '../api/client';
 import {
     TrendingUp, TrendingDown, DollarSign, Layers,
     Camera, Map, Bot, History, FileText, Settings, HelpCircle,
-    Lightbulb, Zap
+    Lightbulb, Zap, ArrowRight
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
-const ActionGridItem = ({ icon: Icon, label, path, color = 'var(--primary-color)' }) => {
+const ActionGridItem = ({ icon: Icon, label, path, color = 'var(--primary-color)', bgColor }) => {
     const navigate = useNavigate();
+    const [hovered, setHovered] = useState(false);
+
     return (
         <Card
-            padding="1rem"
+            padding="0.875rem"
             hoverable
             onClick={() => navigate(path)}
             className="animate-slide-up"
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '8px', justifyContent: 'center' }}
+            style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: '0.5rem',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                border: hovered ? `1.5px solid ${color}30` : '1px solid var(--border-color)',
+                transition: 'all 0.2s',
+            }}
+            onMouseEnter={() => setHovered(true)}
+            onMouseLeave={() => setHovered(false)}
         >
             <div style={{
-                backgroundColor: `${color}15`,
+                backgroundColor: bgColor || `${color}12`,
                 color: color,
-                padding: '0.75rem',
-                borderRadius: '50%',
+                padding: '0.625rem',
+                borderRadius: '10px',
                 display: 'flex',
                 alignItems: 'center',
-                justifyContent: 'center'
+                justifyContent: 'center',
+                transition: 'transform 0.2s',
+                transform: hovered ? 'scale(1.1)' : 'scale(1)',
             }}>
-                <Icon size={24} />
+                <Icon size={20} />
             </div>
-            <span style={{ fontSize: '0.75rem', fontWeight: '500', textAlign: 'center' }}>{label}</span>
+            <span style={{ fontSize: '0.75rem', fontWeight: '500', textAlign: 'center', color: 'var(--text-body)', lineHeight: 1.2 }}>
+                {label}
+            </span>
         </Card>
     );
 };
 
-const MetricItem = ({ icon: Icon, label, value, color }) => (
-    <Card padding="0.75rem" style={{ flex: '1', minWidth: '70px', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div style={{ backgroundColor: `${color}15`, color: color, padding: '0.5rem', borderRadius: '50%', marginBottom: '0.5rem' }}>
-            <Icon size={18} />
+const MetricCard = ({ icon: Icon, label, value, color, subLabel }) => (
+    <Card
+        padding="1rem"
+        style={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: '0.875rem',
+            borderLeft: `3px solid ${color}`,
+        }}
+    >
+        <div style={{
+            backgroundColor: `${color}12`,
+            color: color,
+            padding: '0.625rem',
+            borderRadius: '10px',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            flexShrink: 0,
+        }}>
+            <Icon size={20} />
         </div>
-        <div className="text-muted" style={{ fontSize: '0.7rem' }}>{label}</div>
-        <div style={{ fontWeight: '600', fontSize: '0.9rem' }}>{value}</div>
+        <div style={{ minWidth: 0 }}>
+            <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 400, marginBottom: '2px' }}>
+                {label}
+            </div>
+            <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-dark)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                {value}
+            </div>
+            {subLabel && <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '1px' }}>{subLabel}</div>}
+        </div>
     </Card>
 );
 
 const Dashboard = () => {
     const [data, setData] = useState(null);
     const [loading, setLoading] = useState(true);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -55,7 +97,7 @@ const Dashboard = () => {
                 const result = await dashboardAPI.getSummary();
                 if (result.success) setData(result);
             } catch (e) {
-                console.error("Dashboard fetch error", e);
+                console.error('Dashboard fetch error', e);
             } finally {
                 setLoading(false);
             }
@@ -63,103 +105,159 @@ const Dashboard = () => {
         fetchData();
     }, []);
 
-    if (loading) return <div className="flex-center" style={{ height: '50vh' }}>Loading...</div>;
+    if (loading) return (
+        <div className="flex-center" style={{ height: '50vh', flexDirection: 'column', gap: '1rem' }}>
+            <div style={{
+                width: 36, height: 36, borderRadius: '50%',
+                border: '3px solid var(--primary-light)',
+                borderTopColor: 'var(--primary-color)',
+                animation: 'spin 0.8s linear infinite',
+            }} />
+            <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+            <p className="text-muted">Loading your farm data...</p>
+        </div>
+    );
 
     const metrics = data?.metrics || { earned: 0, spent: 0, profit: 0, areas: 0 };
     const recentActs = data?.recentActivities || [];
 
     return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div className="page-wrapper">
             <Header />
 
-            {/* Metrics Row */}
-            <div style={{ display: 'flex', gap: '0.75rem', overflowX: 'auto', paddingBottom: '0.5rem' }}>
-                <MetricItem icon={TrendingUp} label="Earned" value={`₹${metrics.earned}`} color="var(--primary-color)" />
-                <MetricItem icon={TrendingDown} label="Spent" value={`₹${metrics.spent}`} color="var(--accent-orange)" />
-                <MetricItem icon={DollarSign} label="Profit" value={`₹${metrics.profit}`} color="var(--primary-color)" />
-                <MetricItem icon={Layers} label="Areas" value={metrics.areas} color="var(--primary-color)" />
+            {/* Metrics Grid */}
+            <div>
+                <h2 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.75rem' }}>
+                    Overview
+                </h2>
+                <div className="metrics-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+                    <MetricCard icon={TrendingUp} label="Total Earned" value={`₹${metrics.earned.toLocaleString()}`} color="var(--primary-color)" subLabel="Revenue" />
+                    <MetricCard icon={TrendingDown} label="Total Spent" value={`₹${metrics.spent.toLocaleString()}`} color="var(--accent-orange)" subLabel="Expenses" />
+                    <MetricCard icon={DollarSign} label="Net Profit" value={`₹${metrics.profit.toLocaleString()}`} color={metrics.profit >= 0 ? 'var(--primary-color)' : 'var(--accent-red)'} subLabel={metrics.profit >= 0 ? 'Positive' : 'Loss'} />
+                    <MetricCard icon={Layers} label="Farm Areas" value={metrics.areas} color="#8b5cf6" subLabel="Sections" />
+                </div>
             </div>
 
             {/* Quick Actions */}
-            <div style={{ marginTop: '0.5rem' }}>
-                <h2 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Zap size={18} color="var(--accent-orange)" fill="var(--accent-orange)" /> Quick Actions
-                </h2>
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
-                    <ActionGridItem icon={Camera} label="Record Sale" path="/record-sale" color="var(--primary-color)" />
-                    <ActionGridItem icon={DollarSign} label="Add Expense" path="/add-expense" color="var(--primary-color)" />
-                    <ActionGridItem icon={Map} label="Manage Areas" path="/sections" color="var(--primary-color)" />
-                    <ActionGridItem icon={Bot} label="AI Helper" path="/ai-assistant" color="var(--primary-color)" />
-                    <ActionGridItem icon={History} label="View Records" path="/transactions" color="var(--primary-color)" />
-                    <ActionGridItem icon={FileText} label="Reports" path="/reports" color="var(--primary-color)" />
-                    <ActionGridItem icon={Settings} label="Settings" path="/profile" color="var(--primary-color)" />
-                    <ActionGridItem icon={HelpCircle} label="Get Help" path="/help" color="var(--primary-color)" />
+            <div>
+                <div className="flex-between" style={{ marginBottom: '0.75rem' }}>
+                    <h2 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
+                        Quick Actions
+                    </h2>
+                    <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        <Zap size={12} color="var(--accent-orange)" fill="var(--accent-orange)" /> Fast access
+                    </span>
+                </div>
+                <div className="actions-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
+                    <ActionGridItem icon={Camera}      label="Record Sale"   path="/record-sale"  color="var(--primary-color)" />
+                    <ActionGridItem icon={DollarSign}  label="Add Expense"   path="/add-expense"  color="var(--accent-orange)" />
+                    <ActionGridItem icon={Map}         label="Farm Areas"    path="/sections"     color="#8b5cf6" />
+                    <ActionGridItem icon={Bot}         label="AI Helper"     path="/ai-assistant" color="#06b6d4" />
+                    <ActionGridItem icon={History}     label="View Records"  path="/transactions" color="var(--text-body)" />
+                    <ActionGridItem icon={FileText}    label="Reports"       path="/reports"      color="var(--primary-color)" />
+                    <ActionGridItem icon={Settings}    label="Settings"      path="/profile"      color="var(--text-muted)" />
+                    <ActionGridItem icon={HelpCircle}  label="Get Help"      path="/help"         color="var(--accent-orange)" />
                 </div>
             </div>
 
             {/* AI Tips Banner */}
-            <Card style={{
-                backgroundColor: 'var(--bg-main)',
-                borderColor: 'var(--primary-light)',
-                borderWidth: '2px',
-                background: 'linear-gradient(to right bottom, #e8f5e9, #c8e6c9)',
-                marginTop: '0.5rem',
-                textAlign: 'center',
-                padding: '1.5rem'
+            <div style={{
+                background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
+                borderRadius: 'var(--border-radius-lg)',
+                border: '1px solid #bbf7d0',
+                padding: '1.25rem',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
             }}>
                 <div style={{
-                    backgroundColor: 'var(--accent-orange)',
-                    color: 'white',
-                    width: '36px', height: '36px',
-                    borderRadius: '50%',
+                    width: 44, height: 44,
+                    background: 'linear-gradient(135deg, var(--accent-orange), #f97316)',
+                    borderRadius: '12px',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    margin: '0 auto 1rem auto'
+                    flexShrink: 0,
                 }}>
-                    <Lightbulb size={20} />
+                    <Lightbulb size={22} color="white" />
                 </div>
-                <h3 style={{ fontWeight: '600', marginBottom: '0.25rem' }}>Get Smart Farming Tips! 💡</h3>
-                <p className="text-muted" style={{ marginBottom: '1.25rem', fontSize: '0.875rem' }}>
-                    Let our AI analyze your farm and give helpful advice
-                </p>
-                <button style={{
-                    backgroundColor: 'var(--primary-color)',
-                    color: 'white',
-                    border: 'none',
-                    padding: '0.75rem 1.5rem',
-                    borderRadius: '24px',
-                    fontWeight: '500',
-                    cursor: 'pointer',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '8px',
-                    margin: '0 auto'
-                }}>
-                    <span role="img" aria-label="leaf">🌿</span> Get My Tips Now
+                <div style={{ flex: 1, minWidth: 0 }}>
+                    <h3 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '2px', color: 'var(--text-dark)' }}>
+                        Get Smart Farming Tips
+                    </h3>
+                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
+                        Let our AI analyze your farm and provide tailored advice.
+                    </p>
+                </div>
+                <button
+                    onClick={() => navigate('/ai-assistant')}
+                    style={{
+                        background: 'var(--primary-color)',
+                        color: 'white', border: 'none',
+                        padding: '0.5rem 0.875rem',
+                        borderRadius: '20px',
+                        fontSize: '0.8rem', fontWeight: 600,
+                        cursor: 'pointer',
+                        display: 'flex', alignItems: 'center', gap: 5,
+                        flexShrink: 0,
+                        whiteSpace: 'nowrap',
+                    }}
+                >
+                    Ask AI <ArrowRight size={13} />
                 </button>
-            </Card>
+            </div>
 
             {/* Recent Activities */}
-            <Card style={{ marginTop: '0.5rem' }}>
+            <Card>
                 <div className="flex-between" style={{ marginBottom: '1rem' }}>
-                    <h3 style={{ fontSize: '0.9rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <History size={16} className="text-muted" /> Recent Activities
+                    <h3 style={{ fontSize: '0.95rem', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                        <History size={16} color="var(--text-muted)" /> Recent Activity
                     </h3>
-                    <a href="/transactions" style={{ fontSize: '0.8rem' }}>View All</a>
+                    <a href="/transactions" style={{ fontSize: '0.8rem', display: 'flex', alignItems: 'center', gap: 4 }}>
+                        View All <ArrowRight size={12} />
+                    </a>
                 </div>
 
                 {recentActs.length === 0 ? (
-                    <div style={{ textAlign: 'center', padding: '2rem 1rem', color: 'var(--text-muted)', fontSize: '0.875rem' }}>
-                        No transactions yet. Record a sale or expense to get started!
+                    <div style={{ textAlign: 'center', padding: '2rem 1rem' }}>
+                        <div style={{ fontSize: '2rem', marginBottom: '0.5rem' }}>🌱</div>
+                        <p className="text-muted">No transactions yet. Record a sale or expense to get started!</p>
                     </div>
                 ) : (
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
                         {recentActs.map((act, i) => (
-                            <div key={i} style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.5rem' }}>
-                                <div>
-                                    <div style={{ fontWeight: '500', fontSize: '0.875rem' }}>{act.description || act.transaction_type}</div>
-                                    <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{act.transaction_date}</div>
+                            <div
+                                key={i}
+                                style={{
+                                    display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+                                    padding: '0.75rem 0',
+                                    borderBottom: i < recentActs.length - 1 ? '1px solid var(--border-color)' : 'none',
+                                }}
+                            >
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                    <div style={{
+                                        width: 32, height: 32, borderRadius: '8px',
+                                        background: act.transaction_type === 'sale' ? 'var(--primary-100)' : 'var(--accent-orange-light)',
+                                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                        flexShrink: 0,
+                                    }}>
+                                        {act.transaction_type === 'sale'
+                                            ? <TrendingUp size={14} color="var(--primary-dark)" />
+                                            : <TrendingDown size={14} color="var(--accent-orange)" />
+                                        }
+                                    </div>
+                                    <div>
+                                        <div style={{ fontWeight: 500, fontSize: '0.875rem', color: 'var(--text-dark)' }}>
+                                            {act.description || act.transaction_type}
+                                        </div>
+                                        <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                            {act.transaction_date}
+                                        </div>
+                                    </div>
                                 </div>
-                                <div style={{ fontWeight: '600', color: act.transaction_type === 'sale' ? 'var(--primary-color)' : 'var(--accent-red)' }}>
+                                <div style={{
+                                    fontWeight: 700,
+                                    fontSize: '0.95rem',
+                                    color: act.transaction_type === 'sale' ? 'var(--primary-color)' : 'var(--accent-red)',
+                                }}>
                                     {act.transaction_type === 'sale' ? '+' : '-'}₹{act.amount}
                                 </div>
                             </div>
@@ -167,7 +265,6 @@ const Dashboard = () => {
                     </div>
                 )}
             </Card>
-
         </div>
     );
 };
