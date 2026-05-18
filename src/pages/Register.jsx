@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../api/client';
 import Button from '../components/Button';
-import { Sprout } from 'lucide-react';
 
 const Register = () => {
     const [formData, setFormData] = useState({
@@ -61,7 +60,7 @@ const Register = () => {
             {/* Left panel (desktop only) */}
             <div style={{
                 flex: '0 0 38%',
-                background: 'linear-gradient(160deg, #16a34a 0%, #15803d 50%, #166534 100%)',
+                background: 'linear-gradient(160deg, #4a9e3f 0%, #2d6a27 50%, #1e4d1b 100%)',
                 display: 'none',
                 flexDirection: 'column',
                 justifyContent: 'center',
@@ -77,13 +76,8 @@ const Register = () => {
                 <div style={{ position: 'absolute', bottom: -30, left: -30, width: 150, height: 150, borderRadius: '50%', background: 'rgba(255,255,255,0.05)' }} />
 
                 <div style={{ position: 'relative', zIndex: 1, textAlign: 'center' }}>
-                    <div style={{
-                        width: 64, height: 64, borderRadius: '18px',
-                        background: 'rgba(255,255,255,0.2)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        margin: '0 auto 1.5rem',
-                    }}>
-                        <Sprout size={32} color="white" />
+                    <div style={{ display: 'flex', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+                        <img src="/logo.png" alt="Time2Farm" style={{ width: 72, height: 72, objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
                     </div>
                     <h1 style={{ fontSize: '2rem', fontWeight: 800, marginBottom: '0.5rem', color: 'white' }}>
                         Time2Farm
@@ -106,14 +100,7 @@ const Register = () => {
             }}>
                 <div style={{ width: '100%', maxWidth: 480 }}>
                     <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                        <div style={{
-                            width: 48, height: 48, borderRadius: '13px',
-                            background: 'linear-gradient(135deg, var(--primary-color), var(--primary-dark))',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            margin: '0 auto 0.75rem',
-                        }}>
-                            <Sprout size={24} color="white" />
-                        </div>
+                        <img src="/logo.png" alt="Time2Farm" style={{ width: 52, height: 52, objectFit: 'contain', margin: '0 auto 0.75rem', display: 'block' }} />
                         <h1 style={{ fontSize: '1.6rem', fontWeight: 800, color: 'var(--text-dark)' }}>
                             Create your account
                         </h1>

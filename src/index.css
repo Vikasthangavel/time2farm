@@ -4,34 +4,36 @@
    DESIGN TOKENS
    ============================================= */
 :root {
-  /* Brand Colors */
-  --primary-color: #16a34a;
-  --primary-dark: #15803d;
-  --primary-light: #4ade80;
-  --primary-50: #f0fdf4;
-  --primary-100: #dcfce7;
+  /* Brand Colors — matched to logo */
+  --primary-color: #4a9e3f;
+  --primary-dark: #2d6a27;
+  --primary-light: #72c263;
+  --primary-50: #f2faf0;
+  --primary-100: #d6f0d0;
 
   /* Background Colors */
-  --bg-main: #f8fafc;
+  --bg-main: #f5faf4;
   --bg-card: #ffffff;
   --bg-sidebar: #ffffff;
 
   /* Text Colors */
-  --text-dark: #0f172a;
-  --text-body: #334155;
-  --text-muted: #64748b;
+  --text-dark: #0f1f0c;
+  --text-body: #2e3d28;
+  --text-muted: #637560;
   --text-light: #ffffff;
 
-  /* Accents */
-  --accent-orange: #f59e0b;
+  /* Accents — gold from logo tick marks */
+  --accent-gold: #f5c832;
+  --accent-gold-light: #fef9d7;
+  --accent-orange: #e8a020;
   --accent-orange-light: #fef3c7;
-  --accent-red: #ef4444;
-  --accent-red-light: #fee2e2;
-  --accent-green: #22c55e;
+  --accent-red: #d94040;
+  --accent-red-light: #fde8e8;
+  --accent-green: #72c263;
 
   /* Borders & Shadows */
-  --border-color: #e2e8f0;
-  --border-focus: #16a34a;
+  --border-color: #ddebd8;
+  --border-focus: #4a9e3f;
   --shadow-xs: 0 1px 2px rgba(0,0,0,0.05);
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.05);
   --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.04);

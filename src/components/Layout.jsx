@@ -1,6 +1,6 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Home, PlusCircle, LineChart, User, Sprout, LogOut } from 'lucide-react';
+import { Home, PlusCircle, LineChart, User, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ChatWidget from './ChatWidget';
 
@@ -43,21 +43,17 @@ const Sidebar = () => {
         }}>
             {/* Brand */}
             <div style={{
-                padding: '1.5rem 1.25rem 1.25rem',
+                padding: '1.25rem 1.25rem 1rem',
                 borderBottom: '1px solid var(--border-color)',
                 display: 'flex',
                 alignItems: 'center',
                 gap: '10px',
             }}>
-                <div style={{
-                    width: 36, height: 36,
-                    borderRadius: '10px',
-                    background: 'linear-gradient(135deg, var(--primary-color), var(--primary-dark))',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    flexShrink: 0,
-                }}>
-                    <Sprout size={20} color="white" />
-                </div>
+                <img
+                    src="/logo.png"
+                    alt="Time2Farm logo"
+                    style={{ width: 38, height: 38, objectFit: 'contain', flexShrink: 0 }}
+                />
                 <div>
                     <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-dark)', lineHeight: 1.2 }}>
                         Time2Farm

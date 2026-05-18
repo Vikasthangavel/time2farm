@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, CalendarDays, LogOut, Sprout } from 'lucide-react';
+import { MapPin, CalendarDays, LogOut } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useNavigate } from 'react-router-dom';
 
@@ -25,14 +25,14 @@ const Header = () => {
 
     return (
         <div style={{
-            background: 'linear-gradient(135deg, #16a34a 0%, #15803d 60%, #166534 100%)',
+            background: 'linear-gradient(135deg, #4a9e3f 0%, #2d6a27 60%, #1e4d1b 100%)',
             borderRadius: 'var(--border-radius-xl)',
             color: 'white',
             padding: '1.5rem',
             marginBottom: '1.5rem',
             position: 'relative',
             overflow: 'hidden',
-            boxShadow: '0 4px 20px rgba(22,163,74,0.25)',
+            boxShadow: '0 4px 20px rgba(45,106,39,0.3)',
         }}>
             {/* Decorative circles */}
             <div style={{
@@ -72,7 +72,7 @@ const Header = () => {
                             {user?.full_name?.split(' ')[0] || 'Farmer'}
                         </h1>
 
-                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                        <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
                             <span style={{
                                 display: 'inline-flex', alignItems: 'center', gap: '5px',
                                 background: 'rgba(255,255,255,0.18)',
@@ -80,7 +80,8 @@ const Header = () => {
                                 padding: '4px 10px', borderRadius: '20px',
                                 fontSize: '0.78rem', fontWeight: 500,
                             }}>
-                                <Sprout size={12} /> {user?.farm_name || 'My Farm'}
+                                <img src="/logo.png" alt="" style={{ width: 14, height: 14, objectFit: 'contain', filter: 'brightness(0) invert(1)' }} />
+                                {user?.farm_name || 'My Farm'}
                             </span>
                             <span style={{
                                 display: 'inline-flex', alignItems: 'center', gap: '5px',
