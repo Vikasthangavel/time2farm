@@ -47,6 +47,7 @@
 
   /* Sidebar */
   --sidebar-width: 240px;
+  --mobile-nav-height: 74px;
 
   /* Typography */
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -311,7 +312,7 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   .main-content {
     margin-left: 0;
     padding: 1rem;
-    padding-bottom: 80px; /* space for bottom nav */
+    padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 12px); /* space for bottom nav */
   }
 
   /* Chat widget on mobile: above bottom nav bar */

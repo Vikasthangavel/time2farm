@@ -170,7 +170,7 @@ const BottomNavigation = () => {
             bottom: 0,
             left: 0,
             right: 0,
-            height: '64px',
+            height: 'var(--mobile-nav-height)',
             backgroundColor: 'var(--bg-card)',
             borderTop: '1px solid var(--border-color)',
             display: 'flex',
@@ -179,6 +179,9 @@ const BottomNavigation = () => {
             paddingBottom: 'env(safe-area-inset-bottom)',
             zIndex: 100,
             boxShadow: '0 -4px 12px rgba(0,0,0,0.06)',
+            transform: 'translateZ(0)',
+            willChange: 'transform',
+            overflow: 'hidden',
         }}>
             {mobileNavItems.map((item) => {
                 const active = isActive(item);
@@ -191,26 +194,34 @@ const BottomNavigation = () => {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            gap: '2px',
+                            justifyContent: 'center',
+                            gap: '4px',
                             color: active ? 'var(--primary-color)' : 'var(--text-muted)',
                             background: 'none',
                             border: 'none',
                             cursor: 'pointer',
                             transition: 'color 0.2s',
                             flex: 1,
-                            padding: '4px 2px',
+                            padding: '6px 2px 8px',
                             minWidth: 0,
+                            height: '100%',
+                            boxSizing: 'border-box',
                         }}
                     >
                         <div style={{
-                            padding: active ? '3px 10px' : '3px 6px',
-                            borderRadius: '20px',
+                            width: 34,
+                            height: 34,
+                            borderRadius: '9999px',
                             background: active ? 'var(--primary-100)' : 'transparent',
                             transition: 'all 0.2s',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            flexShrink: 0,
                         }}>
-                            <Icon size={18} />
+                            <Icon size={20} strokeWidth={2.2} />
                         </div>
-                        <span style={{ fontSize: '0.62rem', fontWeight: active ? '600' : '400', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                        <span style={{ fontSize: '0.64rem', fontWeight: active ? '600' : '500', lineHeight: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
                             {item.label}
                         </span>
                     </button>

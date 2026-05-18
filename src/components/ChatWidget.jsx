@@ -59,7 +59,7 @@ const ChatWidget = () => {
                     className="chat-fab"
                     style={{
                         position: 'fixed',
-                        bottom: '88px',   /* above mobile bottom nav */
+                        bottom: 'calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 12px)',   /* above mobile bottom nav */
                         right: '16px',
                         width: '52px',
                         height: '52px',
@@ -94,7 +94,7 @@ const ChatWidget = () => {
                     className="chat-panel"
                     style={{
                         position: 'fixed',
-                        bottom: '88px',   /* matches button offset */
+                        bottom: 'calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 12px)',   /* matches button offset */
                         right: '16px',
                         width: 'min(360px, calc(100vw - 32px))',
                         height: 'min(500px, calc(100vh - 150px))',
