@@ -181,10 +181,27 @@ export const sectionsAPI = {
 };
 
 export const reportsAPI = {
-    generateReport: () => {
-        // Trigger direct browser download
-        const baseUrl = import.meta.env.VITE_API_BASE_URL || '';
-        window.location.href = `${baseUrl}/api/reports/generate`;
+    generateReport: async () => {
+        const response = await apiClient.get('/reports/generate', {
+            responseType: 'blob',
+        });
+
+        const contentDisposition = response.headers?.['content-disposition'] || '';
+        const filenameMatch = contentDisposition.match(/filename\*=UTF-8''([^;]+)|filename="?([^";]+)"?/i);
+        const filename = decodeURIComponent(filenameMatch?.[1] || filenameMatch?.[2] || `Time2Farm_Report_${new Date().toISOString().slice(0, 10)}.pdf`);
+
+        const blob = new Blob([response.data], { type: 'application/pdf' });
+        const downloadUrl = window.URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+        link.download = filename;
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+
+        return { success: true, filename };
     }
 };
 

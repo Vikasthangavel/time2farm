@@ -11,14 +11,11 @@ const Reports = () => {
 
     const handleGenerateReport = () => {
         setIsGenerating(true);
-        try {
-            reportsAPI.generateReport();
-            // We set a timeout to reset the button state since window.location doesn't give a callback
-            setTimeout(() => setIsGenerating(false), 3000);
-        } catch (error) {
-            console.error("Failed to generate report", error);
-            setIsGenerating(false);
-        }
+        reportsAPI.generateReport()
+            .catch((error) => {
+                console.error("Failed to generate report", error);
+            })
+            .finally(() => setIsGenerating(false));
     };
 
     return (
