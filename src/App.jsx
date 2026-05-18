@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import Layout from './components/Layout';
+import PWAInstallBanner from './components/PWAInstallBanner';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
@@ -21,7 +22,13 @@ const ProtectedRoute = ({ children }) => {
   if (loading) return <div className="flex-center" style={{ height: '100vh' }}>Loading...</div>;
   if (!user) return <Navigate to="/login" replace />;
 
-  return children;
+  return (
+    <>
+      {children}
+      {/* PWA banner is only shown when the user is logged in */}
+      <PWAInstallBanner />
+    </>
+  );
 };
 
 
