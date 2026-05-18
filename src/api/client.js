@@ -9,6 +9,21 @@ const apiClient = axios.create({
     },
 });
 
+export const AUTH_TOKEN_KEY = 'time2farm.auth.token';
+
+export const setAuthToken = (token) => {
+    if (token) {
+        apiClient.defaults.headers.common.Authorization = `Bearer ${token}`;
+    } else {
+        delete apiClient.defaults.headers.common.Authorization;
+    }
+};
+
+const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
+if (storedToken) {
+    setAuthToken(storedToken);
+}
+
 export const authAPI = {
     login: async (username, password) => {
         const response = await apiClient.post('/auth/login', { username, password });
