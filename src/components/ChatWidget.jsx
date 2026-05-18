@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { aiAPI } from '../api/client';
-import { Bot, X, Send } from 'lucide-react';
-import Card from './Card';
+import { Bot, X, Send, MessageCircle } from 'lucide-react';
 
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -45,111 +44,218 @@ const ChatWidget = () => {
 
     return (
         <>
-            <button
-                onClick={() => setIsOpen(true)}
-                className="animate-slide-up"
-                style={{
-                    display: isOpen ? 'none' : 'flex',
-                    position: 'absolute',
-                    bottom: '80px',
-                    right: '16px',
-                    width: '50px',
-                    height: '50px',
-                    borderRadius: '50%',
-                    backgroundColor: 'var(--primary-color)',
-                    color: 'white',
-                    border: 'none',
-                    boxShadow: 'var(--shadow-lg)',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    cursor: 'pointer',
-                    zIndex: 1000
-                }}
-            >
-                <Bot size={24} />
-            </button>
-
-            {isOpen && (
-                <Card
-                    padding="0"
+            {/* ── Floating trigger button ─────────────── */}
+            {!isOpen && (
+                <button
+                    onClick={() => setIsOpen(true)}
+                    title="Chat with FarmThozhan AI"
+                    className="chat-fab"
                     style={{
-                        position: 'absolute',
-                        bottom: '75px',
-                        right: '10px',
-                        width: 'calc(100% - 20px)',
-                        maxWidth: '360px',
-                        height: '460px',
-                        maxHeight: 'calc(100vh - 120px)',
+                        position: 'fixed',
+                        bottom: '88px',   /* above mobile bottom nav */
+                        right: '16px',
+                        width: '52px',
+                        height: '52px',
+                        borderRadius: '50%',
+                        background: 'linear-gradient(135deg, var(--primary-color), var(--primary-dark))',
+                        color: 'white',
+                        border: 'none',
+                        boxShadow: '0 4px 16px rgba(74,158,63,0.45)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        zIndex: 1100,
+                        transition: 'transform 0.2s, box-shadow 0.2s',
+                    }}
+                    onMouseEnter={e => {
+                        e.currentTarget.style.transform = 'scale(1.08)';
+                        e.currentTarget.style.boxShadow = '0 6px 20px rgba(74,158,63,0.55)';
+                    }}
+                    onMouseLeave={e => {
+                        e.currentTarget.style.transform = 'scale(1)';
+                        e.currentTarget.style.boxShadow = '0 4px 16px rgba(74,158,63,0.45)';
+                    }}
+                >
+                    <Bot size={24} />
+                </button>
+            )}
+
+            {/* ── Chat panel ──────────────────────────── */}
+            {isOpen && (
+                <div
+                    className="chat-panel"
+                    style={{
+                        position: 'fixed',
+                        bottom: '88px',   /* matches button offset */
+                        right: '16px',
+                        width: 'min(360px, calc(100vw - 32px))',
+                        height: 'min(500px, calc(100vh - 150px))',
                         display: 'flex',
                         flexDirection: 'column',
                         overflow: 'hidden',
-                        zIndex: 1001,
+                        zIndex: 1100,
+                        borderRadius: '16px',
                         border: '1px solid var(--border-color)',
-                        boxShadow: 'var(--shadow-lg)'
+                        boxShadow: '0 12px 40px rgba(0,0,0,0.15)',
+                        backgroundColor: 'var(--bg-card)',
+                        animation: 'slideUpChat 0.2s ease-out',
                     }}
                 >
+                    <style>{`
+                        @keyframes slideUpChat {
+                            from { opacity: 0; transform: translateY(12px) scale(0.97); }
+                            to   { opacity: 1; transform: translateY(0) scale(1); }
+                        }
+                        /* On desktop, offset from the right edge of the sidebar too */
+                        @media (min-width: 768px) {
+                            .chat-panel-inner { bottom: 28px !important; right: 28px !important; }
+                        }
+                    `}</style>
+
                     {/* Header */}
-                    <div style={{ backgroundColor: 'var(--primary-color)', color: 'white', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div style={{
+                        background: 'linear-gradient(135deg, var(--primary-color), var(--primary-dark))',
+                        color: 'white',
+                        padding: '0.875rem 1rem',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        flexShrink: 0,
+                    }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                            <Bot size={20} />
-                            <span style={{ fontWeight: '600' }}>FarmThozhan AI</span>
+                            <div style={{
+                                width: 30, height: 30, borderRadius: '50%',
+                                background: 'rgba(255,255,255,0.2)',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                            }}>
+                                <Bot size={17} />
+                            </div>
+                            <div>
+                                <div style={{ fontWeight: 600, fontSize: '0.9rem', lineHeight: 1.2 }}>FarmThozhan AI</div>
+                                <div style={{ fontSize: '0.7rem', opacity: 0.8 }}>Smart farming assistant</div>
+                            </div>
                         </div>
-                        <button onClick={() => setIsOpen(false)} style={{ background: 'none', border: 'none', color: 'white', cursor: 'pointer' }}>
-                            <X size={20} />
+                        <button
+                            onClick={() => setIsOpen(false)}
+                            style={{
+                                background: 'rgba(255,255,255,0.2)',
+                                border: 'none',
+                                color: 'white',
+                                cursor: 'pointer',
+                                borderRadius: '50%',
+                                width: 28, height: 28,
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                transition: 'background 0.15s',
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.3)'}
+                            onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.2)'}
+                        >
+                            <X size={16} />
                         </button>
                     </div>
 
-                    {/* Messages Area */}
-                    <div style={{ flex: 1, padding: '1rem', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.75rem', backgroundColor: '#f9fafb' }}>
+                    {/* Messages */}
+                    <div style={{
+                        flex: 1,
+                        padding: '0.875rem',
+                        overflowY: 'auto',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '0.625rem',
+                        backgroundColor: 'var(--bg-main)',
+                    }}>
                         {messages.map((m, i) => (
                             <div key={i} style={{
                                 alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
-                                backgroundColor: m.role === 'user' ? 'var(--primary-color)' : m.role === 'error' ? 'var(--accent-red)' : 'white',
+                                backgroundColor:
+                                    m.role === 'user' ? 'var(--primary-color)'
+                                    : m.role === 'error' ? 'var(--accent-red)'
+                                    : 'white',
                                 color: m.role === 'user' || m.role === 'error' ? 'white' : 'var(--text-dark)',
-                                padding: '0.75rem',
-                                borderRadius: '12px',
-                                borderBottomRightRadius: m.role === 'user' ? '4px' : '12px',
-                                borderBottomLeftRadius: m.role === 'assistant' ? '4px' : '12px',
+                                padding: '0.625rem 0.875rem',
+                                borderRadius: '14px',
+                                borderBottomRightRadius: m.role === 'user' ? '4px' : '14px',
+                                borderBottomLeftRadius: m.role === 'assistant' ? '4px' : '14px',
                                 maxWidth: '85%',
-                                boxShadow: 'var(--shadow-sm)',
-                                fontSize: '0.875rem',
-                                lineHeight: 1.4
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                                fontSize: '0.85rem',
+                                lineHeight: 1.5,
                             }}>
                                 <div dangerouslySetInnerHTML={{ __html: m.text.replace(/\n/g, '<br/>') }} />
                             </div>
                         ))}
                         {isTyping && (
-                            <div style={{ alignSelf: 'flex-start', backgroundColor: 'white', padding: '0.75rem', borderRadius: '12px', maxWidth: '85%', boxShadow: 'var(--shadow-sm)' }}>
-                                <span className="text-muted" style={{ fontSize: '0.875rem' }}>Typing...</span>
+                            <div style={{
+                                alignSelf: 'flex-start',
+                                backgroundColor: 'white',
+                                padding: '0.625rem 0.875rem',
+                                borderRadius: '14px',
+                                borderBottomLeftRadius: '4px',
+                                boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
+                                display: 'flex', gap: '4px', alignItems: 'center',
+                            }}>
+                                {[0, 1, 2].map(i => (
+                                    <div key={i} style={{
+                                        width: 6, height: 6, borderRadius: '50%',
+                                        background: 'var(--primary-color)',
+                                        animation: `bounce 1s ${i * 0.2}s infinite`,
+                                    }} />
+                                ))}
+                                <style>{`@keyframes bounce { 0%,80%,100%{transform:translateY(0)} 40%{transform:translateY(-5px)} }`}</style>
                             </div>
                         )}
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Input Area */}
-                    <form onSubmit={handleSend} style={{ padding: '0.75rem', borderTop: '1px solid var(--border-color)', display: 'flex', gap: '0.5rem', backgroundColor: 'white' }}>
+                    {/* Input */}
+                    <form
+                        onSubmit={handleSend}
+                        style={{
+                            padding: '0.75rem',
+                            borderTop: '1px solid var(--border-color)',
+                            display: 'flex',
+                            gap: '0.5rem',
+                            backgroundColor: 'white',
+                            flexShrink: 0,
+                        }}
+                    >
                         <input
                             type="text"
                             value={input}
                             onChange={e => setInput(e.target.value)}
-                            placeholder="Ask a question..."
-                            style={{ flex: 1, padding: '0.5rem 0.75rem', borderRadius: '20px', border: '1px solid var(--border-color)', outline: 'none' }}
+                            placeholder="Ask about your farm..."
+                            style={{
+                                flex: 1,
+                                padding: '0.5rem 0.875rem',
+                                borderRadius: '20px',
+                                border: '1.5px solid var(--border-color)',
+                                fontSize: '0.875rem',
+                                outline: 'none',
+                                transition: 'border-color 0.2s',
+                            }}
+                            onFocus={e => e.target.style.borderColor = 'var(--primary-color)'}
+                            onBlur={e => e.target.style.borderColor = 'var(--border-color)'}
                         />
                         <button
                             type="submit"
-                            disabled={isTyping}
+                            disabled={isTyping || !input.trim()}
                             style={{
-                                backgroundColor: input.trim() ? 'var(--primary-color)' : '#9ca3af',
-                                color: 'white', border: 'none', borderRadius: '50%',
-                                width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                                background: input.trim() ? 'var(--primary-color)' : 'var(--border-color)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '50%',
+                                width: '36px', height: '36px',
+                                display: 'flex', alignItems: 'center', justifyContent: 'center',
                                 cursor: input.trim() ? 'pointer' : 'default',
-                                transition: 'background-color 0.2s'
+                                transition: 'background 0.2s',
+                                flexShrink: 0,
                             }}
                         >
-                            <Send size={16} />
+                            <Send size={15} />
                         </button>
                     </form>
-                </Card>
+                </div>
             )}
         </>
     );

@@ -284,6 +284,13 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   .reports-feature-grid {
     grid-template-columns: repeat(2, 1fr);
   }
+
+  /* Chat widget on desktop: positioned from right edge of viewport, not over sidebar */
+  .chat-fab,
+  .chat-panel {
+    bottom: 28px !important;
+    right: 28px !important;
+  }
 }
 
 @media (min-width: 1200px) {
@@ -304,6 +311,13 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
     margin-left: 0;
     padding: 1rem;
     padding-bottom: 80px; /* space for bottom nav */
+  }
+
+  /* Chat widget on mobile: above bottom nav bar */
+  .chat-fab,
+  .chat-panel {
+    bottom: 76px !important;
+    right: 14px !important;
   }
 
   .metrics-row {
