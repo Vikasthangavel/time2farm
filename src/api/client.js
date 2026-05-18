@@ -25,6 +25,10 @@ export const authAPI = {
     checkSession: async () => {
         const response = await apiClient.get('/session/check');
         return response.data;
+    },
+    restoreSession: async (userId) => {
+        const response = await apiClient.post('/session/restore', { user_id: userId });
+        return response.data;
     }
 };
 
