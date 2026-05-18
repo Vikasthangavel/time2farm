@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
                 const storedToken = localStorage.getItem(AUTH_TOKEN_KEY);
                 if (storedToken) {
                     setAuthToken(storedToken);
-                    const restoreResponse = await authAPI.restoreSession({ token: storedToken });
+                    const restoreResponse = await authAPI.restoreSession(storedToken);
                     if (restoreResponse.success && restoreResponse.token) {
                         localStorage.setItem(AUTH_TOKEN_KEY, restoreResponse.token);
                         setAuthToken(restoreResponse.token);
