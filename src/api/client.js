@@ -62,12 +62,20 @@ export const transactionsAPI = {
     getAll: async () => {
         const response = await apiClient.get('/transactions/all');
         return response.data;
+    },
+    getBySection: async (sectionId) => {
+        const response = await apiClient.get(`/sections/${sectionId}/transactions`);
+        return response.data;
     }
 };
 
 export const expensesAPI = {
     addExpense: async (sectionId, expenseData) => {
         const response = await apiClient.post(`/sections/${sectionId}/expenses`, expenseData);
+        return response.data;
+    },
+    updateExpense: async (expenseId, expenseData) => {
+        const response = await apiClient.put(`/expenses/${expenseId}`, expenseData);
         return response.data;
     },
     deleteExpense: async (expenseId) => {
@@ -79,6 +87,10 @@ export const expensesAPI = {
 export const salesAPI = {
     addSale: async (sectionId, saleData) => {
         const response = await apiClient.post(`/sections/${sectionId}/sales`, saleData);
+        return response.data;
+    },
+    updateSale: async (saleId, saleData) => {
+        const response = await apiClient.put(`/sales/${saleId}`, saleData);
         return response.data;
     },
     deleteSale: async (saleId) => {
