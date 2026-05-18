@@ -24,6 +24,17 @@ if (storedToken) {
     setAuthToken(storedToken);
 }
 
+apiClient.interceptors.request.use((config) => {
+    const latestToken = localStorage.getItem(AUTH_TOKEN_KEY);
+    if (latestToken) {
+        config.headers.Authorization = `Bearer ${latestToken}`;
+    } else {
+        delete config.headers.Authorization;
+    }
+
+    return config;
+});
+
 export const authAPI = {
     login: async (username, password) => {
         const response = await apiClient.post('/auth/login', { username, password });

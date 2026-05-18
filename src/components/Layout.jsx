@@ -1,14 +1,24 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { Home, PlusCircle, LineChart, User, LogOut } from 'lucide-react';
+import { Home, PlusCircle, LineChart, User, LogOut, History } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ChatWidget from './ChatWidget';
 
 const navItems = [
-    { icon: Home,       label: 'Home',     path: '/' },
-    { icon: PlusCircle, label: 'Add',      path: '/add-action' },
-    { icon: LineChart,  label: 'Reports',  path: '/reports' },
-    { icon: User,       label: 'Profile',  path: '/settings' },
+    { icon: Home,       label: 'Home',         path: '/' },
+    { icon: PlusCircle, label: 'Add',          path: '/add-action' },
+    { icon: History,    label: 'Transactions', path: '/transactions' },
+    { icon: LineChart,  label: 'Reports',      path: '/reports' },
+    { icon: User,       label: 'Profile',      path: '/settings' },
+];
+
+// Mobile shows only 4 items (Transactions replaces Reports to keep it tight)
+const mobileNavItems = [
+    { icon: Home,       label: 'Home',         path: '/' },
+    { icon: PlusCircle, label: 'Add',          path: '/add-action' },
+    { icon: History,    label: 'Records',      path: '/transactions' },
+    { icon: LineChart,  label: 'Reports',      path: '/reports' },
+    { icon: User,       label: 'Profile',      path: '/settings' },
 ];
 
 /* ── Sidebar (desktop) ─────────────────────── */
@@ -21,7 +31,8 @@ const Sidebar = () => {
         location.pathname === item.path ||
         (item.path === '/add-action' &&
             (location.pathname.includes('/add-expense') ||
-             location.pathname.includes('/record-sale')));
+             location.pathname.includes('/record-sale'))) ||
+        (item.path === '/transactions' && location.pathname === '/transactions');
 
     const handleLogout = async () => {
         await logout();
@@ -150,7 +161,8 @@ const BottomNavigation = () => {
         location.pathname === item.path ||
         (item.path === '/add-action' &&
             (location.pathname.includes('/add-expense') ||
-             location.pathname.includes('/record-sale')));
+             location.pathname.includes('/record-sale'))) ||
+        (item.path === '/transactions' && location.pathname === '/transactions');
 
     return (
         <nav className="bottom-nav" style={{
@@ -168,7 +180,7 @@ const BottomNavigation = () => {
             zIndex: 100,
             boxShadow: '0 -4px 12px rgba(0,0,0,0.06)',
         }}>
-            {navItems.map((item) => {
+            {mobileNavItems.map((item) => {
                 const active = isActive(item);
                 const Icon = item.icon;
                 return (
@@ -179,25 +191,26 @@ const BottomNavigation = () => {
                             display: 'flex',
                             flexDirection: 'column',
                             alignItems: 'center',
-                            gap: '3px',
+                            gap: '2px',
                             color: active ? 'var(--primary-color)' : 'var(--text-muted)',
                             background: 'none',
                             border: 'none',
                             cursor: 'pointer',
                             transition: 'color 0.2s',
                             flex: 1,
-                            padding: '6px 0',
+                            padding: '4px 2px',
+                            minWidth: 0,
                         }}
                     >
                         <div style={{
-                            padding: active ? '4px 12px' : '4px 8px',
+                            padding: active ? '3px 10px' : '3px 6px',
                             borderRadius: '20px',
                             background: active ? 'var(--primary-100)' : 'transparent',
                             transition: 'all 0.2s',
                         }}>
-                            <Icon size={20} />
+                            <Icon size={18} />
                         </div>
-                        <span style={{ fontSize: '0.7rem', fontWeight: active ? '600' : '400' }}>
+                        <span style={{ fontSize: '0.62rem', fontWeight: active ? '600' : '400', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
                             {item.label}
                         </span>
                     </button>

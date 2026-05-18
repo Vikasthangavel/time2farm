@@ -5,10 +5,11 @@ import { Bot, X, Send, MessageCircle } from 'lucide-react';
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState([
-        { role: 'assistant', text: 'Namaskaram! I am FarmThozhan. Ask me anything about your farm expenses or agricultural advice.' }
+        { id: 0, role: 'assistant', text: 'Namaskaram! I am FarmThozhan. Ask me anything about your farm expenses or agricultural advice.' }
     ]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [messageIdCounter, setMessageIdCounter] = useState(1);
     const messagesEndRef = useRef(null);
 
     const scrollToBottom = () => {
@@ -24,19 +25,25 @@ const ChatWidget = () => {
         if (!input.trim()) return;
 
         const userMessage = input.trim();
-        setMessages(prev => [...prev, { role: 'user', text: userMessage }]);
+        const userMsgId = messageIdCounter;
+        setMessageIdCounter(prev => prev + 1);
+        setMessages(prev => [...prev, { id: userMsgId, role: 'user', text: userMessage }]);
         setInput('');
         setIsTyping(true);
 
         try {
             const response = await aiAPI.chat(userMessage);
+            const assistantMsgId = messageIdCounter + 1;
+            setMessageIdCounter(prev => prev + 2);
             if (response.success) {
-                setMessages(prev => [...prev, { role: 'assistant', text: response.response }]);
+                setMessages(prev => [...prev, { id: assistantMsgId, role: 'assistant', text: response.response }]);
             } else {
-                setMessages(prev => [...prev, { role: 'error', text: 'Hmm, I encountered an issue. Try again.' }]);
+                setMessages(prev => [...prev, { id: assistantMsgId, role: 'error', text: 'Hmm, I encountered an issue. Try again.' }]);
             }
         } catch (err) {
-            setMessages(prev => [...prev, { role: 'error', text: 'Network error. Could not reach FarmThozhan.' }]);
+            const errorMsgId = messageIdCounter + 1;
+            setMessageIdCounter(prev => prev + 2);
+            setMessages(prev => [...prev, { id: errorMsgId, role: 'error', text: 'Network error. Could not reach FarmThozhan.' }]);
         } finally {
             setIsTyping(false);
         }
@@ -165,8 +172,8 @@ const ChatWidget = () => {
                         gap: '0.625rem',
                         backgroundColor: 'var(--bg-main)',
                     }}>
-                        {messages.map((m, i) => (
-                            <div key={i} style={{
+                        {messages.map((m) => (
+                            <div key={m.id} style={{
                                 alignSelf: m.role === 'user' ? 'flex-end' : 'flex-start',
                                 backgroundColor:
                                     m.role === 'user' ? 'var(--primary-color)'
@@ -196,7 +203,7 @@ const ChatWidget = () => {
                                 display: 'flex', gap: '4px', alignItems: 'center',
                             }}>
                                 {[0, 1, 2].map(i => (
-                                    <div key={i} style={{
+                                    <div key={`dot-${i}`} style={{
                                         width: 6, height: 6, borderRadius: '50%',
                                         background: 'var(--primary-color)',
                                         animation: `bounce 1s ${i * 0.2}s infinite`,

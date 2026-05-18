@@ -272,7 +272,7 @@ const TransactionsHistory = () => {
     const handleDelete = async (t) => {
         if (t.transaction_type === 'sale') await salesAPI.deleteSale(t.id);
         else await expensesAPI.deleteExpense(t.id);
-        setAllTransactions(prev => prev.filter(x => x.id !== t.id));
+        setAllTransactions(prev => prev.filter(x => !(x.id === t.id && x.transaction_type === t.transaction_type)));
     };
 
     return (
@@ -387,7 +387,7 @@ const TransactionsHistory = () => {
                     </div>
                     {filtered.map((t, idx) => (
                         <TransactionCard
-                            key={t.id || idx}
+                            key={`${t.transaction_type}-${t.id ?? idx}`}
                             t={t}
                             onEdit={setEditTarget}
                             onDelete={handleDelete}

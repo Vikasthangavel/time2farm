@@ -225,13 +225,13 @@ const Dashboard = () => {
                     </div>
                 ) : (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
-                        {recentActs.map((act, i) => (
+                        {recentActs.map((act) => (
                             <div
-                                key={i}
+                                key={act.id}
                                 style={{
                                     display: 'flex', justifyContent: 'space-between', alignItems: 'center',
                                     padding: '0.75rem 0',
-                                    borderBottom: i < recentActs.length - 1 ? '1px solid var(--border-color)' : 'none',
+                                    borderBottom: recentActs.indexOf(act) < recentActs.length - 1 ? '1px solid var(--border-color)' : 'none',
                                 }}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
