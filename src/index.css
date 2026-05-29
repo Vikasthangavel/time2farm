@@ -71,11 +71,12 @@
   padding: 0;
 }
 
-html { scroll-behavior: smooth; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 
 body {
   min-height: 100vh;
   background-color: var(--bg-main);
+  overflow-x: hidden;
 }
 
 #root {
@@ -163,6 +164,20 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   flex-direction: column;
   gap: 1.25rem;
   padding-bottom: 2rem;
+}
+
+/* Mobile-first: metrics = 2-col grid */
+.metrics-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+/* Mobile-first: actions = 4-col compact grid */
+.actions-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.625rem;
 }
 
 .card {
@@ -273,15 +288,17 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   .bottom-nav { display: none !important; }
   .mobile-top-bar { display: none !important; }
 
-  /* Content grid enhancements */
+  /* Override metrics to 4-col on desktop */
   .metrics-row {
-    display: grid !important;
     grid-template-columns: repeat(4, 1fr) !important;
     gap: 1rem !important;
+    display: grid !important;
+    overflow-x: visible !important;
   }
 
   .actions-grid {
     grid-template-columns: repeat(4, 1fr) !important;
+    gap: 0.75rem !important;
   }
 
   /* Reports 2-col grid */
@@ -317,6 +334,7 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
     padding: 1rem;
     padding-top: calc(var(--mobile-top-bar-height) + 1rem); /* clear fixed top bar */
     padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 12px); /* clear bottom nav */
+    overflow-x: hidden;
   }
 
   /* Chat widget on mobile: above bottom nav bar */
@@ -326,17 +344,7 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
     right: 14px !important;
   }
 
-  .metrics-row {
-    display: flex !important;
-    overflow-x: auto !important;
-    gap: 0.75rem !important;
-    padding-bottom: 4px;
-  }
 
-  .metrics-row > * {
-    flex: 0 0 auto;
-    min-width: 110px;
-  }
 }
 
 /* =============================================

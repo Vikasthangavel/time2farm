@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import Header from '../components/Header';
 import Card from '../components/Card';
 import { dashboardAPI } from '../api/client';
 import {
@@ -123,14 +122,13 @@ const Dashboard = () => {
 
     return (
         <div className="page-wrapper">
-            <Header />
 
-            {/* Metrics Grid */}
+            {/* Metrics Grid — 2 cols mobile, 4 cols desktop */}
             <div>
                 <h2 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.75rem' }}>
                     Overview
                 </h2>
-                <div className="metrics-row" style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '0.75rem' }}>
+                <div className="metrics-row">
                     <MetricCard icon={TrendingUp} label="Total Earned" value={`₹${metrics.earned.toLocaleString()}`} color="var(--primary-color)" subLabel="Revenue" />
                     <MetricCard icon={TrendingDown} label="Total Spent" value={`₹${metrics.spent.toLocaleString()}`} color="var(--accent-orange)" subLabel="Expenses" />
                     <MetricCard icon={DollarSign} label="Net Profit" value={`₹${metrics.profit.toLocaleString()}`} color={metrics.profit >= 0 ? 'var(--primary-color)' : 'var(--accent-red)'} subLabel={metrics.profit >= 0 ? 'Positive' : 'Loss'} />
@@ -138,7 +136,7 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* Quick Actions */}
+            {/* Quick Actions — 4 cols always, compact on mobile */}
             <div>
                 <div className="flex-between" style={{ marginBottom: '0.75rem' }}>
                     <h2 style={{ fontSize: '0.8rem', fontWeight: 600, color: 'var(--text-muted)', textTransform: 'uppercase', letterSpacing: '0.06em' }}>
@@ -148,7 +146,7 @@ const Dashboard = () => {
                         <Zap size={12} color="var(--accent-orange)" fill="var(--accent-orange)" /> Fast access
                     </span>
                 </div>
-                <div className="actions-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '0.75rem' }}>
+                <div className="actions-grid">
                     <ActionGridItem icon={Camera}      label="Record Sale"   path="/record-sale"  color="var(--primary-color)" />
                     <ActionGridItem icon={DollarSign}  label="Add Expense"   path="/add-expense"  color="var(--accent-orange)" />
                     <ActionGridItem icon={Map}         label="Farm Areas"    path="/sections"     color="#8b5cf6" />
@@ -160,31 +158,32 @@ const Dashboard = () => {
                 </div>
             </div>
 
-            {/* AI Tips Banner */}
+            {/* AI Tips Banner — wraps on small screens */}
             <div style={{
                 background: 'linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%)',
                 borderRadius: 'var(--border-radius-lg)',
                 border: '1px solid #bbf7d0',
-                padding: '1.25rem',
+                padding: '1rem',
                 display: 'flex',
+                flexWrap: 'wrap',
                 alignItems: 'center',
-                gap: '1rem',
+                gap: '0.75rem',
             }}>
                 <div style={{
-                    width: 44, height: 44,
+                    width: 40, height: 40,
                     background: 'linear-gradient(135deg, var(--accent-orange), #f97316)',
-                    borderRadius: '12px',
+                    borderRadius: '10px',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                     flexShrink: 0,
                 }}>
-                    <Lightbulb size={22} color="white" />
+                    <Lightbulb size={20} color="white" />
                 </div>
-                <div style={{ flex: 1, minWidth: 0 }}>
-                    <h3 style={{ fontSize: '0.9rem', fontWeight: 600, marginBottom: '2px', color: 'var(--text-dark)' }}>
+                <div style={{ flex: '1 1 120px', minWidth: 0 }}>
+                    <h3 style={{ fontSize: '0.875rem', fontWeight: 600, marginBottom: '2px', color: 'var(--text-dark)' }}>
                         Get Smart Farming Tips
                     </h3>
-                    <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', lineHeight: 1.5 }}>
-                        Let our AI analyze your farm and provide tailored advice.
+                    <p style={{ fontSize: '0.78rem', color: 'var(--text-muted)', lineHeight: 1.4, margin: 0 }}>
+                        AI-powered advice for your farm.
                     </p>
                 </div>
                 <button
@@ -192,13 +191,14 @@ const Dashboard = () => {
                     style={{
                         background: 'var(--primary-color)',
                         color: 'white', border: 'none',
-                        padding: '0.5rem 0.875rem',
+                        padding: '0.45rem 0.875rem',
                         borderRadius: '20px',
                         fontSize: '0.8rem', fontWeight: 600,
                         cursor: 'pointer',
                         display: 'flex', alignItems: 'center', gap: 5,
                         flexShrink: 0,
                         whiteSpace: 'nowrap',
+                        alignSelf: 'center',
                     }}
                 >
                     Ask AI <ArrowRight size={13} />
