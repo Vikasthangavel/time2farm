@@ -12,7 +12,6 @@ const navItems = [
     { icon: User,       label: 'Profile',      path: '/settings' },
 ];
 
-// Mobile shows only 4 items (Transactions replaces Reports to keep it tight)
 const mobileNavItems = [
     { icon: Home,       label: 'Home',         path: '/' },
     { icon: PlusCircle, label: 'Add',          path: '/add-action' },
@@ -21,7 +20,7 @@ const mobileNavItems = [
     { icon: User,       label: 'Profile',      path: '/settings' },
 ];
 
-/* ── Sidebar (desktop) ─────────────────────── */
+/* ── Sidebar (desktop only) ────────────────── */
 const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -118,11 +117,8 @@ const Sidebar = () => {
                 })}
             </nav>
 
-            {/* Logout button at bottom */}
-            <div style={{
-                padding: '1rem 0.75rem',
-                borderTop: '1px solid var(--border-color)',
-            }}>
+            {/* Logout */}
+            <div style={{ padding: '1rem 0.75rem', borderTop: '1px solid var(--border-color)' }}>
                 <button
                     onClick={handleLogout}
                     style={{
@@ -149,6 +145,98 @@ const Sidebar = () => {
                 </button>
             </div>
         </aside>
+    );
+};
+
+/* ── Mobile Top App Bar ───────────────────────
+   Fixed at the top. Visible on ALL pages with the SAME UI.
+   Hidden on desktop — sidebar handles branding there.
+   ─────────────────────────────────────────── */
+const PAGE_TITLES = {
+    '/':                 'Dashboard',
+    '/add-action':       'Add Action',
+    '/record-sale':      'Record Sale',
+    '/add-expense':      'Add Expense',
+    '/transactions':     'Transactions',
+    '/reports':          'Reports',
+    '/reports/download': 'Download Report',
+    '/settings':         'Profile',
+    '/profile':          'Profile',
+    '/ai-assistant':     'AI Assistant',
+};
+
+const TopAppBar = () => {
+    const location = useLocation();
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const title =
+        PAGE_TITLES[location.pathname] ??
+        (location.pathname.startsWith('/sections') ? 'Farm Areas' : 'Time2Farm');
+
+    const handleLogout = async () => {
+        await logout();
+        navigate('/login');
+    };
+
+    return (
+        <header className="mobile-top-bar" style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            right: 0,
+            height: 'var(--mobile-top-bar-height)',
+            backgroundColor: 'var(--bg-card)',
+            borderBottom: '1px solid var(--border-color)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            padding: '0 1rem',
+            zIndex: 200,
+            boxShadow: '0 1px 8px rgba(0,0,0,0.07)',
+        }}>
+            {/* Logo + name */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
+                <img
+                    src="/logo.png"
+                    alt="Time2Farm"
+                    style={{ width: 30, height: 30, objectFit: 'contain', flexShrink: 0 }}
+                />
+                <div>
+                    <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-dark)', lineHeight: 1.15 }}>
+                        Time2Farm
+                    </div>
+                    <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', lineHeight: 1, fontWeight: 400 }}>
+                        {title}
+                    </div>
+                </div>
+            </div>
+
+            {/* Logout icon */}
+            <button
+                onClick={handleLogout}
+                title="Logout"
+                style={{
+                    background: 'var(--accent-red-light)',
+                    border: 'none',
+                    color: 'var(--accent-red)',
+                    padding: '7px',
+                    borderRadius: '50%',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    width: 34,
+                    height: 34,
+                    transition: 'background 0.2s',
+                    flexShrink: 0,
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#f9c4c4'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'var(--accent-red-light)'; }}
+            >
+                <LogOut size={15} />
+            </button>
+        </header>
     );
 };
 
@@ -221,7 +309,15 @@ const BottomNavigation = () => {
                         }}>
                             <Icon size={20} strokeWidth={2.2} />
                         </div>
-                        <span style={{ fontSize: '0.64rem', fontWeight: active ? '600' : '500', lineHeight: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '100%' }}>
+                        <span style={{
+                            fontSize: '0.64rem',
+                            fontWeight: active ? '600' : '500',
+                            lineHeight: 1,
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            maxWidth: '100%',
+                        }}>
                             {item.label}
                         </span>
                     </button>
@@ -235,9 +331,13 @@ const BottomNavigation = () => {
 const Layout = () => {
     return (
         <div className="app-shell" style={{ minHeight: '100vh', display: 'flex' }}>
+            {/* Desktop sidebar */}
             <Sidebar />
 
-            {/* Offset main content by sidebar width on desktop */}
+            {/* Mobile top bar — always fixed, same UI on every page */}
+            <TopAppBar />
+
+            {/* Page content */}
             <div className="main-content" style={{ flex: 1 }}>
                 <Outlet />
             </div>

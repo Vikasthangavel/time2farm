@@ -45,9 +45,10 @@
   --border-radius-xl: 24px;
   --border-radius-full: 9999px;
 
-  /* Sidebar */
+  /* Sidebar & mobile nav */
   --sidebar-width: 240px;
   --mobile-nav-height: 74px;
+  --mobile-top-bar-height: 56px;
 
   /* Typography */
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
@@ -268,8 +269,9 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
     box-sizing: border-box;
   }
 
-  /* Hide bottom nav on desktop */
+  /* Hide bottom nav and mobile top bar on desktop */
   .bottom-nav { display: none !important; }
+  .mobile-top-bar { display: none !important; }
 
   /* Content grid enhancements */
   .metrics-row {
@@ -308,11 +310,13 @@ button:disabled { opacity: 0.6; cursor: not-allowed; }
   /* Hide fixed sidebar on mobile */
   .sidebar { display: none !important; }
   .bottom-nav { display: flex !important; }
+  .mobile-top-bar { display: flex !important; }
 
   .main-content {
     margin-left: 0;
     padding: 1rem;
-    padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 12px); /* space for bottom nav */
+    padding-top: calc(var(--mobile-top-bar-height) + 1rem); /* clear fixed top bar */
+    padding-bottom: calc(var(--mobile-nav-height) + env(safe-area-inset-bottom) + 12px); /* clear bottom nav */
   }
 
   /* Chat widget on mobile: above bottom nav bar */
