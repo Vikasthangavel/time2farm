@@ -20,7 +20,6 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
     const [categories, setCategories] = useState([]);
     const [loadingConfig, setLoadingConfig] = useState(false);
     const selectedSection = sections.find(s => String(s.id) === String(sectionId));
-    const selectedCategory = categories.find(c => String(c.id) === String(categoryId));
 
     // Form State
     const [categoryId, setCategoryId] = useState('');
@@ -33,6 +32,7 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
     const [notes, setNotes] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
+    const selectedCategory = categories.find(c => String(c.id) === String(categoryId));
 
     useEffect(() => {
         const init = async () => {
