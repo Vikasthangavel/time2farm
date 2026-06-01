@@ -3,6 +3,23 @@ import { useNavigate } from 'react-router-dom';
 import { authAPI } from '../api/client';
 import Button from '../components/Button';
 
+// Defined OUTSIDE Register so React doesn't treat it as a new component on every render.
+// If defined inside, every keystroke re-mounts the input and focus is lost.
+const Field = ({ label, name, type = 'text', required, minLength, placeholder, value, onChange }) => (
+    <div>
+        <label>{label}{required && ' *'}</label>
+        <input
+            name={name}
+            type={type}
+            value={value}
+            onChange={onChange}
+            required={required}
+            minLength={minLength}
+            placeholder={placeholder}
+        />
+    </div>
+);
+
 const Register = () => {
     const [formData, setFormData] = useState({
         username: '', email: '', password: '',
@@ -35,20 +52,6 @@ const Register = () => {
         }
     };
 
-    const Field = ({ label, name, type = 'text', required, minLength, placeholder }) => (
-        <div>
-            <label>{label}{required && ' *'}</label>
-            <input
-                name={name}
-                type={type}
-                value={formData[name]}
-                onChange={handleChange}
-                required={required}
-                minLength={minLength}
-                placeholder={placeholder}
-            />
-        </div>
-    );
 
     return (
         <div style={{
@@ -126,16 +129,16 @@ const Register = () => {
                     <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                         {/* Two-column row */}
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                            <Field label="Full Name"  name="full_name" required placeholder="John Doe" />
-                            <Field label="Username"   name="username"  required placeholder="johndoe" />
+                            <Field label="Full Name"  name="full_name" required placeholder="John Doe"   value={formData.full_name} onChange={handleChange} />
+                            <Field label="Username"   name="username"  required placeholder="johndoe"     value={formData.username}  onChange={handleChange} />
                         </div>
 
-                        <Field label="Email Address" name="email"    type="email"    required placeholder="john@example.com" />
-                        <Field label="Password"      name="password" type="password" required minLength={6} placeholder="Min. 6 characters" />
+                        <Field label="Email Address" name="email"    type="email"    required placeholder="john@example.com"   value={formData.email}    onChange={handleChange} />
+                        <Field label="Password"      name="password" type="password" required minLength={6} placeholder="Min. 6 characters" value={formData.password} onChange={handleChange} />
 
                         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
-                            <Field label="Farm Name" name="farm_name" placeholder="My Green Farm" />
-                            <Field label="Phone"     name="phone"     type="tel"    placeholder="+91 98765 43210" />
+                            <Field label="Farm Name" name="farm_name" placeholder="My Green Farm"     value={formData.farm_name} onChange={handleChange} />
+                            <Field label="Phone"     name="phone"     type="tel" placeholder="+91 98765 43210" value={formData.phone}     onChange={handleChange} />
                         </div>
 
                         <Button
