@@ -15,8 +15,10 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
 
     const [sections, setSections] = useState([]);
     const [sectionId, setSectionId] = useState('');
+    const [showSectionPicker, setShowSectionPicker] = useState(false);
     const [categories, setCategories] = useState([]);
     const [loadingConfig, setLoadingConfig] = useState(false);
+    const selectedSection = sections.find(s => String(s.id) === String(sectionId));
 
     // Form State
     const [categoryId, setCategoryId] = useState('');
@@ -104,6 +106,117 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
 
     return (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingBottom: '2rem' }}>
+            {showSectionPicker && (
+                <div
+                    onClick={() => setShowSectionPicker(false)}
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        zIndex: 2000,
+                        backgroundColor: 'rgba(15, 23, 42, 0.45)',
+                        backdropFilter: 'blur(4px)',
+                        display: 'flex',
+                        alignItems: 'flex-end',
+                        justifyContent: 'center',
+                        padding: '1rem',
+                    }}
+                >
+                    <Card
+                        padding="0"
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                            width: '100%',
+                            maxWidth: 520,
+                            borderRadius: '22px',
+                            overflow: 'hidden',
+                            boxShadow: '0 24px 70px rgba(0, 0, 0, 0.28)',
+                        }}
+                    >
+                        <div style={{
+                            padding: '1rem 1.1rem',
+                            background: 'linear-gradient(135deg, var(--primary-color), var(--primary-dark))',
+                            color: 'white',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                        }}>
+                            <div>
+                                <div style={{ fontWeight: 700, fontSize: '1rem' }}>Choose Area</div>
+                                <div style={{ fontSize: '0.78rem', opacity: 0.9 }}>Select where this record belongs</div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setShowSectionPicker(false)}
+                                style={{
+                                    background: 'rgba(255,255,255,0.18)',
+                                    border: 'none',
+                                    color: 'white',
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: '50%',
+                                    cursor: 'pointer',
+                                    fontSize: '1rem',
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div style={{ padding: '0.9rem', maxHeight: '52vh', overflowY: 'auto' }}>
+                            <div style={{ display: 'grid', gap: '0.65rem' }}>
+                                {sections.map(section => {
+                                    const active = String(section.id) === String(sectionId);
+                                    return (
+                                        <button
+                                            key={section.id}
+                                            type="button"
+                                            onClick={() => {
+                                                setSectionId(String(section.id));
+                                                setShowSectionPicker(false);
+                                            }}
+                                            style={{
+                                                textAlign: 'left',
+                                                border: `1.5px solid ${active ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                                                background: active ? 'var(--primary-50)' : 'white',
+                                                color: 'var(--text-dark)',
+                                                borderRadius: '16px',
+                                                padding: '0.9rem 1rem',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                gap: '0.75rem',
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            <div style={{ minWidth: 0 }}>
+                                                <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{section.name}</div>
+                                                <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                                                    {section.description || 'No description'}
+                                                </div>
+                                            </div>
+                                            {active && (
+                                                <span style={{
+                                                    background: 'var(--primary-color)',
+                                                    color: 'white',
+                                                    padding: '0.25rem 0.55rem',
+                                                    borderRadius: '999px',
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: 700,
+                                                    flexShrink: 0,
+                                                }}>
+                                                    Selected
+                                                </span>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            )}
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                 <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dark)' }}>
                     <ArrowLeft size={24} />
@@ -128,12 +241,33 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                         {/* Common Fields */}
                         <div>
                             <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', fontWeight: '500' }}>Select Area</label>
-                            <select
-                                value={sectionId} onChange={e => setSectionId(e.target.value)} required
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: 'white' }}
+                            <button
+                                type="button"
+                                onClick={() => setShowSectionPicker(true)}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.85rem 0.95rem',
+                                    borderRadius: '14px',
+                                    border: '1px solid var(--border-color)',
+                                    background: 'white',
+                                    color: sectionId ? 'var(--text-dark)' : 'var(--text-muted)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    gap: '0.75rem',
+                                    cursor: 'pointer',
+                                    boxShadow: '0 1px 0 rgba(15, 23, 42, 0.02)',
+                                }}
                             >
-                                {sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
-                            </select>
+                                <span style={{ textAlign: 'left' }}>
+                                    <span style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)' }}>Area</span>
+                                    <span style={{ display: 'block', fontSize: '0.95rem', fontWeight: 700 }}>
+                                        {selectedSection ? selectedSection.name : 'Choose an area'}
+                                    </span>
+                                </span>
+                                <span style={{ color: 'var(--primary-color)', fontSize: '1.1rem', lineHeight: 1 }}>▾</span>
+                            </button>
+                            <input type="hidden" value={sectionId} required readOnly />
                         </div>
 
                         <div>
