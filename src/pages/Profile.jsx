@@ -4,14 +4,14 @@ import Button from '../components/Button';
 import { userAPI, transactionsAPI, sectionsAPI } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import {
-    User, Save, Phone, MapPin, Building2,
+    User, Save, Phone, MapPin, Building2, Calendar,
     CheckCircle2, AlertCircle, TrendingUp, TrendingDown, Layers, DollarSign
 } from 'lucide-react';
 
 const Profile = () => {
     const { user } = useAuth();
 
-    const [profile, setProfile] = useState({ full_name: '', farm_name: '', phone: '', address: '' });
+    const [profile, setProfile] = useState({ full_name: '', farm_name: '', phone: '', address: '', records_from_date: '' });
     const [stats, setStats]     = useState({ sales: 0, expenses: 0, sections: 0, income: 0, expense: 0 });
     const [loading, setLoading]   = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -29,6 +29,7 @@ const Profile = () => {
                     farm_name: profRes.user.farm_name || '',
                     phone:     profRes.user.phone     || '',
                     address:   profRes.user.address   || '',
+                    records_from_date: profRes.user.records_from_date || '',
                 });
             }
             if (txRes.success) {
@@ -212,6 +213,22 @@ const Profile = () => {
                             placeholder="Village, District, State"
                             style={{ resize: 'none' }}
                         />
+                    </div>
+
+                    <div>
+                        <label style={{ display: 'flex', alignItems: 'center', gap: '5px', fontSize: '0.8rem', fontWeight: 500, color: 'var(--text-muted)', marginBottom: '0.3rem' }}>
+                            <Calendar size={13} /> Records From
+                        </label>
+                        <input
+                            type="date"
+                            name="records_from_date"
+                            value={profile.records_from_date}
+                            onChange={handleChange}
+                            placeholder="Show records from this date"
+                        />
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', marginTop: '0.35rem' }}>
+                            Only sales, expenses, summaries, and reports on or after this date will show.
+                        </div>
                     </div>
 
                     <Button
