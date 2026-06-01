@@ -16,9 +16,11 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
     const [sections, setSections] = useState([]);
     const [sectionId, setSectionId] = useState('');
     const [showSectionPicker, setShowSectionPicker] = useState(false);
+    const [showCategoryPicker, setShowCategoryPicker] = useState(false);
     const [categories, setCategories] = useState([]);
     const [loadingConfig, setLoadingConfig] = useState(false);
     const selectedSection = sections.find(s => String(s.id) === String(sectionId));
+    const selectedCategory = categories.find(c => String(c.id) === String(categoryId));
 
     // Form State
     const [categoryId, setCategoryId] = useState('');
@@ -67,6 +69,10 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!categoryId) {
+            setError(`Please select a ${isSale ? 'category / product' : 'category'} first.`);
+            return;
+        }
         setIsSubmitting(true);
         setError('');
 
@@ -217,6 +223,118 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                 </div>
             )}
 
+            {showCategoryPicker && (
+                <div
+                    onClick={() => setShowCategoryPicker(false)}
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        zIndex: 2000,
+                        backgroundColor: 'rgba(15, 23, 42, 0.45)',
+                        backdropFilter: 'blur(4px)',
+                        display: 'flex',
+                        alignItems: 'flex-end',
+                        justifyContent: 'center',
+                        padding: '1rem',
+                    }}
+                >
+                    <Card
+                        padding="0"
+                        onClick={e => e.stopPropagation()}
+                        style={{
+                            width: '100%',
+                            maxWidth: 520,
+                            borderRadius: '22px',
+                            overflow: 'hidden',
+                            boxShadow: '0 24px 70px rgba(0, 0, 0, 0.28)',
+                        }}
+                    >
+                        <div style={{
+                            padding: '1rem 1.1rem',
+                            background: 'linear-gradient(135deg, var(--primary-color), var(--primary-dark))',
+                            color: 'white',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            gap: '0.75rem',
+                        }}>
+                            <div>
+                                <div style={{ fontWeight: 700, fontSize: '1rem' }}>{isSale ? 'Choose Product' : 'Choose Expense Category'}</div>
+                                <div style={{ fontSize: '0.78rem', opacity: 0.9 }}>Pick the category for this record</div>
+                            </div>
+                            <button
+                                type="button"
+                                onClick={() => setShowCategoryPicker(false)}
+                                style={{
+                                    background: 'rgba(255,255,255,0.18)',
+                                    border: 'none',
+                                    color: 'white',
+                                    width: 32,
+                                    height: 32,
+                                    borderRadius: '50%',
+                                    cursor: 'pointer',
+                                    fontSize: '1rem',
+                                }}
+                            >
+                                ×
+                            </button>
+                        </div>
+
+                        <div style={{ padding: '0.9rem', maxHeight: '52vh', overflowY: 'auto' }}>
+                            <div style={{ display: 'grid', gap: '0.65rem' }}>
+                                {categories.map(category => {
+                                    const active = String(category.id) === String(categoryId);
+                                    const subtitle = category.description || (isSale ? 'Sell item' : 'Expense item');
+                                    return (
+                                        <button
+                                            key={category.id}
+                                            type="button"
+                                            onClick={() => {
+                                                setCategoryId(String(category.id));
+                                                setShowCategoryPicker(false);
+                                            }}
+                                            style={{
+                                                textAlign: 'left',
+                                                border: `1.5px solid ${active ? 'var(--primary-color)' : 'var(--border-color)'}`,
+                                                background: active ? 'var(--primary-50)' : 'white',
+                                                color: 'var(--text-dark)',
+                                                borderRadius: '16px',
+                                                padding: '0.9rem 1rem',
+                                                display: 'flex',
+                                                alignItems: 'center',
+                                                justifyContent: 'space-between',
+                                                gap: '0.75rem',
+                                                cursor: 'pointer',
+                                            }}
+                                        >
+                                            <div style={{ minWidth: 0 }}>
+                                                <div style={{ fontWeight: 700, fontSize: '0.95rem' }}>{category.name}</div>
+                                                <div style={{ fontSize: '0.76rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                                                    {subtitle}
+                                                </div>
+                                            </div>
+                                            {active && (
+                                                <span style={{
+                                                    background: 'var(--primary-color)',
+                                                    color: 'white',
+                                                    padding: '0.25rem 0.55rem',
+                                                    borderRadius: '999px',
+                                                    fontSize: '0.7rem',
+                                                    fontWeight: 700,
+                                                    flexShrink: 0,
+                                                }}>
+                                                    Selected
+                                                </span>
+                                            )}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            )}
+
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
                 <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dark)' }}>
                     <ArrowLeft size={24} />
@@ -282,13 +400,39 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                             <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.25rem', fontWeight: '500' }}>
                                 {isSale ? 'Category / Product' : 'Expense Category'}
                             </label>
-                            <select
-                                value={categoryId} onChange={e => setCategoryId(e.target.value)} required disabled={loadingConfig}
-                                style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', backgroundColor: 'white' }}
+                            <button
+                                type="button"
+                                onClick={() => setShowCategoryPicker(true)}
+                                disabled={loadingConfig || categories.length === 0}
+                                style={{
+                                    width: '100%',
+                                    padding: '0.85rem 0.95rem',
+                                    borderRadius: '14px',
+                                    border: '1px solid var(--border-color)',
+                                    background: 'white',
+                                    color: categoryId ? 'var(--text-dark)' : 'var(--text-muted)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    gap: '0.75rem',
+                                    cursor: loadingConfig || categories.length === 0 ? 'not-allowed' : 'pointer',
+                                    opacity: loadingConfig || categories.length === 0 ? 0.75 : 1,
+                                    boxShadow: '0 1px 0 rgba(15, 23, 42, 0.02)',
+                                }}
                             >
-                                <option value="" disabled>{loadingConfig ? 'Loading...' : 'Select a category...'}</option>
-                                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
-                            </select>
+                                <span style={{ textAlign: 'left' }}>
+                                    <span style={{ display: 'block', fontSize: '0.82rem', fontWeight: 600, color: 'var(--text-muted)' }}>
+                                        {isSale ? 'Product' : 'Category'}
+                                    </span>
+                                    <span style={{ display: 'block', fontSize: '0.95rem', fontWeight: 700 }}>
+                                        {loadingConfig
+                                            ? 'Loading...'
+                                            : (selectedCategory ? selectedCategory.name : 'Choose a category')}
+                                    </span>
+                                </span>
+                                <span style={{ color: 'var(--primary-color)', fontSize: '1.1rem', lineHeight: 1 }}>▾</span>
+                            </button>
+                            <input type="hidden" value={categoryId} readOnly />
                         </div>
 
                         <div>
@@ -337,7 +481,7 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                             <textarea value={notes} onChange={e => setNotes(e.target.value)} rows="2" style={{ width: '100%', padding: '0.75rem', borderRadius: '8px', border: '1px solid var(--border-color)', fontFamily: 'inherit' }} />
                         </div>
 
-                        <Button type="submit" fullWidth disabled={isSubmitting || loadingConfig || categories.length === 0} style={{ marginTop: '1rem' }} variant={isSale ? 'primary' : 'danger'}>
+                        <Button type="submit" fullWidth disabled={isSubmitting || loadingConfig || categories.length === 0 || !categoryId} style={{ marginTop: '1rem' }} variant={isSale ? 'primary' : 'danger'}>
                             {isSubmitting ? 'Saving...' : `Save ${isSale ? 'Sale' : 'Expense'}`}
                         </Button>
 
