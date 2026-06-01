@@ -6,6 +6,85 @@ import Card from '../components/Card';
 import Button from '../components/Button';
 import { ArrowLeft, PlusCircle, TrendingDown, TrendingUp } from 'lucide-react';
 
+// Inject modal animation styles once
+const MODAL_STYLE_ID = 'tf-modal-styles';
+if (!document.getElementById(MODAL_STYLE_ID)) {
+    const style = document.createElement('style');
+    style.id = MODAL_STYLE_ID;
+    style.textContent = `
+        @keyframes tfSlideUp {
+            from { opacity: 0; transform: translateY(40px) scale(0.97); }
+            to   { opacity: 1; transform: translateY(0)   scale(1); }
+        }
+        @keyframes tfFadeIn {
+            from { opacity: 0; }
+            to   { opacity: 1; }
+        }
+        .tf-modal-backdrop {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(15, 23, 42, 0.5);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+            padding: 0;
+            animation: tfFadeIn 0.18s ease;
+        }
+        @media (min-width: 640px) {
+            .tf-modal-backdrop {
+                align-items: center;
+                padding: 1.5rem;
+            }
+        }
+        .tf-modal-card {
+            width: 100%;
+            max-width: 520px;
+            border-radius: 24px 24px 0 0;
+            overflow: hidden;
+            box-shadow: 0 -8px 40px rgba(0,0,0,0.18), 0 24px 60px rgba(0,0,0,0.22);
+            animation: tfSlideUp 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        @media (min-width: 640px) {
+            .tf-modal-card {
+                border-radius: 24px;
+                box-shadow: 0 24px 80px rgba(0,0,0,0.28);
+            }
+        }
+        .tf-modal-drag-handle {
+            width: 40px;
+            height: 4px;
+            background: rgba(255,255,255,0.4);
+            border-radius: 99px;
+            margin: 0 auto 0.6rem;
+        }
+        @media (min-width: 640px) {
+            .tf-modal-drag-handle { display: none; }
+        }
+        .tf-option-btn {
+            width: 100%;
+            text-align: left;
+            border-radius: 14px;
+            padding: 0.9rem 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, transform 0.1s;
+        }
+        .tf-option-btn:hover {
+            transform: translateY(-1px);
+        }
+        .tf-option-btn:active {
+            transform: translateY(0);
+        }
+    `;
+    document.head.appendChild(style);
+}
+
 const TransactionForm = ({ defaultType = 'expense' }) => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -114,85 +193,74 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', paddingBottom: '2rem' }}>
             {showSectionPicker && (
                 <div
+                    className="tf-modal-backdrop"
                     onClick={() => setShowSectionPicker(false)}
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        zIndex: 2000,
-                        backgroundColor: 'rgba(15, 23, 42, 0.45)',
-                        backdropFilter: 'blur(4px)',
-                        display: 'flex',
-                        alignItems: 'flex-end',
-                        justifyContent: 'center',
-                        padding: '1rem',
-                    }}
                 >
-                    <Card
-                        padding="0"
+                    <div
+                        className="tf-modal-card"
                         onClick={e => e.stopPropagation()}
-                        style={{
-                            width: '100%',
-                            maxWidth: 520,
-                            borderRadius: '22px',
-                            overflow: 'hidden',
-                            boxShadow: '0 24px 70px rgba(0, 0, 0, 0.28)',
-                        }}
+                        style={{ background: 'var(--card-bg, #fff)' }}
                     >
+                        {/* Green header */}
                         <div style={{
-                            padding: '1rem 1.1rem',
+                            padding: '0.75rem 1.1rem 1rem',
                             background: 'linear-gradient(135deg, var(--primary-color), var(--primary-dark))',
                             color: 'white',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            gap: '0.75rem',
                         }}>
-                            <div>
-                                <div style={{ fontWeight: 700, fontSize: '1rem' }}>Choose Area</div>
-                                <div style={{ fontSize: '0.78rem', opacity: 0.9 }}>Select where this record belongs</div>
+                            <div className="tf-modal-drag-handle" />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+                                <div>
+                                    <div style={{ fontWeight: 700, fontSize: '1.05rem', letterSpacing: '-0.01em' }}>Choose Area</div>
+                                    <div style={{ fontSize: '0.78rem', opacity: 0.85, marginTop: '2px' }}>Select where this record belongs</div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowSectionPicker(false)}
+                                    style={{
+                                        background: 'rgba(255,255,255,0.2)',
+                                        border: 'none',
+                                        color: 'white',
+                                        width: 34,
+                                        height: 34,
+                                        borderRadius: '50%',
+                                        cursor: 'pointer',
+                                        fontSize: '1.2rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0,
+                                        lineHeight: 1,
+                                    }}
+                                    aria-label="Close"
+                                >
+                                    ×
+                                </button>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => setShowSectionPicker(false)}
-                                style={{
-                                    background: 'rgba(255,255,255,0.18)',
-                                    border: 'none',
-                                    color: 'white',
-                                    width: 32,
-                                    height: 32,
-                                    borderRadius: '50%',
-                                    cursor: 'pointer',
-                                    fontSize: '1rem',
-                                }}
-                            >
-                                ×
-                            </button>
                         </div>
 
-                        <div style={{ padding: '0.9rem', maxHeight: '52vh', overflowY: 'auto' }}>
-                            <div style={{ display: 'grid', gap: '0.65rem' }}>
+                        {/* Options list */}
+                        <div style={{
+                            padding: '0.85rem',
+                            maxHeight: '55vh',
+                            overflowY: 'auto',
+                            paddingBottom: 'calc(0.85rem + env(safe-area-inset-bottom, 0px))',
+                        }}>
+                            <div style={{ display: 'grid', gap: '0.6rem' }}>
                                 {sections.map(section => {
                                     const active = String(section.id) === String(sectionId);
                                     return (
                                         <button
                                             key={section.id}
                                             type="button"
+                                            className="tf-option-btn"
                                             onClick={() => {
                                                 setSectionId(String(section.id));
                                                 setShowSectionPicker(false);
                                             }}
                                             style={{
-                                                textAlign: 'left',
-                                                border: `1.5px solid ${active ? 'var(--primary-color)' : 'var(--border-color)'}`,
-                                                background: active ? 'var(--primary-50)' : 'white',
+                                                border: `1.5px solid ${active ? 'var(--primary-color)' : 'var(--border-color, #e2e8f0)'}`,
+                                                background: active ? 'var(--primary-50, #f0fdf4)' : 'transparent',
                                                 color: 'var(--text-dark)',
-                                                borderRadius: '16px',
-                                                padding: '0.9rem 1rem',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                                gap: '0.75rem',
-                                                cursor: 'pointer',
                                             }}
                                         >
                                             <div style={{ minWidth: 0 }}>
@@ -205,11 +273,12 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                                                 <span style={{
                                                     background: 'var(--primary-color)',
                                                     color: 'white',
-                                                    padding: '0.25rem 0.55rem',
+                                                    padding: '0.22rem 0.6rem',
                                                     borderRadius: '999px',
                                                     fontSize: '0.7rem',
                                                     fontWeight: 700,
                                                     flexShrink: 0,
+                                                    whiteSpace: 'nowrap',
                                                 }}>
                                                     Selected
                                                 </span>
@@ -219,69 +288,67 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                                 })}
                             </div>
                         </div>
-                    </Card>
+                    </div>
                 </div>
             )}
 
             {showCategoryPicker && (
                 <div
+                    className="tf-modal-backdrop"
                     onClick={() => setShowCategoryPicker(false)}
-                    style={{
-                        position: 'fixed',
-                        inset: 0,
-                        zIndex: 2000,
-                        backgroundColor: 'rgba(15, 23, 42, 0.45)',
-                        backdropFilter: 'blur(4px)',
-                        display: 'flex',
-                        alignItems: 'flex-end',
-                        justifyContent: 'center',
-                        padding: '1rem',
-                    }}
                 >
-                    <Card
-                        padding="0"
+                    <div
+                        className="tf-modal-card"
                         onClick={e => e.stopPropagation()}
-                        style={{
-                            width: '100%',
-                            maxWidth: 520,
-                            borderRadius: '22px',
-                            overflow: 'hidden',
-                            boxShadow: '0 24px 70px rgba(0, 0, 0, 0.28)',
-                        }}
+                        style={{ background: 'var(--card-bg, #fff)' }}
                     >
+                        {/* Green header */}
                         <div style={{
-                            padding: '1rem 1.1rem',
+                            padding: '0.75rem 1.1rem 1rem',
                             background: 'linear-gradient(135deg, var(--primary-color), var(--primary-dark))',
                             color: 'white',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                            gap: '0.75rem',
                         }}>
-                            <div>
-                                <div style={{ fontWeight: 700, fontSize: '1rem' }}>{isSale ? 'Choose Product' : 'Choose Expense Category'}</div>
-                                <div style={{ fontSize: '0.78rem', opacity: 0.9 }}>Pick the category for this record</div>
+                            <div className="tf-modal-drag-handle" />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '0.75rem' }}>
+                                <div>
+                                    <div style={{ fontWeight: 700, fontSize: '1.05rem', letterSpacing: '-0.01em' }}>
+                                        {isSale ? 'Choose Product' : 'Choose Expense Category'}
+                                    </div>
+                                    <div style={{ fontSize: '0.78rem', opacity: 0.85, marginTop: '2px' }}>Pick the category for this record</div>
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCategoryPicker(false)}
+                                    style={{
+                                        background: 'rgba(255,255,255,0.2)',
+                                        border: 'none',
+                                        color: 'white',
+                                        width: 34,
+                                        height: 34,
+                                        borderRadius: '50%',
+                                        cursor: 'pointer',
+                                        fontSize: '1.2rem',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        flexShrink: 0,
+                                        lineHeight: 1,
+                                    }}
+                                    aria-label="Close"
+                                >
+                                    ×
+                                </button>
                             </div>
-                            <button
-                                type="button"
-                                onClick={() => setShowCategoryPicker(false)}
-                                style={{
-                                    background: 'rgba(255,255,255,0.18)',
-                                    border: 'none',
-                                    color: 'white',
-                                    width: 32,
-                                    height: 32,
-                                    borderRadius: '50%',
-                                    cursor: 'pointer',
-                                    fontSize: '1rem',
-                                }}
-                            >
-                                ×
-                            </button>
                         </div>
 
-                        <div style={{ padding: '0.9rem', maxHeight: '52vh', overflowY: 'auto' }}>
-                            <div style={{ display: 'grid', gap: '0.65rem' }}>
+                        {/* Options list */}
+                        <div style={{
+                            padding: '0.85rem',
+                            maxHeight: '55vh',
+                            overflowY: 'auto',
+                            paddingBottom: 'calc(0.85rem + env(safe-area-inset-bottom, 0px))',
+                        }}>
+                            <div style={{ display: 'grid', gap: '0.6rem' }}>
                                 {categories.map(category => {
                                     const active = String(category.id) === String(categoryId);
                                     const subtitle = category.description || (isSale ? 'Sell item' : 'Expense item');
@@ -289,22 +356,15 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                                         <button
                                             key={category.id}
                                             type="button"
+                                            className="tf-option-btn"
                                             onClick={() => {
                                                 setCategoryId(String(category.id));
                                                 setShowCategoryPicker(false);
                                             }}
                                             style={{
-                                                textAlign: 'left',
-                                                border: `1.5px solid ${active ? 'var(--primary-color)' : 'var(--border-color)'}`,
-                                                background: active ? 'var(--primary-50)' : 'white',
+                                                border: `1.5px solid ${active ? 'var(--primary-color)' : 'var(--border-color, #e2e8f0)'}`,
+                                                background: active ? 'var(--primary-50, #f0fdf4)' : 'transparent',
                                                 color: 'var(--text-dark)',
-                                                borderRadius: '16px',
-                                                padding: '0.9rem 1rem',
-                                                display: 'flex',
-                                                alignItems: 'center',
-                                                justifyContent: 'space-between',
-                                                gap: '0.75rem',
-                                                cursor: 'pointer',
                                             }}
                                         >
                                             <div style={{ minWidth: 0 }}>
@@ -317,11 +377,12 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                                                 <span style={{
                                                     background: 'var(--primary-color)',
                                                     color: 'white',
-                                                    padding: '0.25rem 0.55rem',
+                                                    padding: '0.22rem 0.6rem',
                                                     borderRadius: '999px',
                                                     fontSize: '0.7rem',
                                                     fontWeight: 700,
                                                     flexShrink: 0,
+                                                    whiteSpace: 'nowrap',
                                                 }}>
                                                     Selected
                                                 </span>
@@ -331,7 +392,7 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                                 })}
                             </div>
                         </div>
-                    </Card>
+                    </div>
                 </div>
             )}
 
