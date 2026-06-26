@@ -5,7 +5,7 @@ import { userAPI, transactionsAPI, sectionsAPI } from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import {
     User, Save, Phone, MapPin, Building2, Calendar,
-    CheckCircle2, AlertCircle, TrendingUp, TrendingDown, Layers, DollarSign
+    CheckCircle2, AlertCircle, TrendingUp, TrendingDown, Layers, DollarSign, Trash2
 } from 'lucide-react';
 
 const Profile = () => {
@@ -15,6 +15,7 @@ const Profile = () => {
     const [stats, setStats]     = useState({ sales: 0, expenses: 0, sections: 0, income: 0, expense: 0 });
     const [loading, setLoading]   = useState(true);
     const [isSaving, setIsSaving] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
     const [message, setMessage]   = useState({ text: '', type: '' });
 
     useEffect(() => {
@@ -64,6 +65,26 @@ const Profile = () => {
         } finally {
             setIsSaving(false);
             setTimeout(() => setMessage({ text: '', type: '' }), 3500);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        if (!window.confirm('Are you sure you want to delete your account? This action cannot be undone.')) {
+            return;
+        }
+        setIsDeleting(true);
+        try {
+            const res = await userAPI.deleteAccount();
+            if (res.success) {
+                localStorage.removeItem('time2farm.auth.token');
+                window.location.href = '/';
+            } else {
+                setMessage({ text: res.message || 'Failed to delete account.', type: 'error' });
+                setIsDeleting(false);
+            }
+        } catch {
+            setMessage({ text: 'An error occurred while deleting account.', type: 'error' });
+            setIsDeleting(false);
         }
     };
 
@@ -238,6 +259,27 @@ const Profile = () => {
                         <Save size={15} /> {isSaving ? 'Saving…' : 'Save Changes'}
                     </Button>
                 </form>
+            </Card>
+
+            {/* ── Delete Account ── */}
+            <Card style={{ marginTop: '1.5rem', border: '1px solid var(--accent-red-light)' }}>
+                <h2 style={{ fontSize: '0.95rem', fontWeight: 600, color: 'var(--accent-red)', marginBottom: '0.5rem' }}>
+                    Danger Zone
+                </h2>
+                <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '1rem' }}>
+                    Once you delete your account, there is no going back. Please be certain.
+                </p>
+                <Button
+                    onClick={handleDeleteAccount}
+                    disabled={isDeleting}
+                    style={{ 
+                        background: 'var(--accent-red)', 
+                        color: 'white',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '7px' 
+                    }}
+                >
+                    <Trash2 size={15} /> {isDeleting ? 'Deleting...' : 'Delete Account'}
+                </Button>
             </Card>
         </div>
     );

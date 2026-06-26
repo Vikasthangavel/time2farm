@@ -15,6 +15,7 @@ import Profile from './pages/Profile';
 import AIAssistant from './pages/AIAssistant';
 import Reports from './pages/Reports';
 import ReportDownload from './pages/ReportDownload';
+import DeleteAccountPublic from './pages/DeleteAccountPublic';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -39,6 +40,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/delete-account" element={<DeleteAccountPublic />} />
 
       {/* Protected Layout Routes */}
       <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>

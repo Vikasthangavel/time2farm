@@ -186,27 +186,27 @@ const TopAppBar = () => {
             left: 0,
             right: 0,
             height: 'var(--mobile-top-bar-height)',
-            backgroundColor: 'var(--bg-card)',
-            borderBottom: '1px solid var(--border-color)',
+            backgroundColor: 'var(--primary-color)',
+            borderBottom: 'none',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             padding: '0 1rem',
             zIndex: 200,
-            boxShadow: '0 1px 8px rgba(0,0,0,0.07)',
+            boxShadow: '0 2px 12px rgba(74,158,63,0.25)',
         }}>
             {/* Logo + name */}
             <div style={{ display: 'flex', alignItems: 'center', gap: '9px' }}>
                 <img
                     src="/logo.png"
                     alt="Time2Farm"
-                    style={{ width: 30, height: 30, objectFit: 'contain', flexShrink: 0 }}
+                    style={{ width: 30, height: 30, objectFit: 'contain', flexShrink: 0, borderRadius: 6 }}
                 />
                 <div>
-                    <div style={{ fontWeight: 700, fontSize: '0.95rem', color: 'var(--text-dark)', lineHeight: 1.15 }}>
+                    <div style={{ fontWeight: 700, fontSize: '0.95rem', color: '#ffffff', lineHeight: 1.15 }}>
                         Time2Farm
                     </div>
-                    <div style={{ fontSize: '0.65rem', color: 'var(--text-muted)', lineHeight: 1, fontWeight: 400 }}>
+                    <div style={{ fontSize: '0.65rem', color: 'rgba(255,255,255,0.75)', lineHeight: 1, fontWeight: 400 }}>
                         {title}
                     </div>
                 </div>
@@ -217,9 +217,9 @@ const TopAppBar = () => {
                 onClick={handleLogout}
                 title="Logout"
                 style={{
-                    background: 'var(--accent-red-light)',
-                    border: 'none',
-                    color: 'var(--accent-red)',
+                    background: 'rgba(255,255,255,0.18)',
+                    border: '1px solid rgba(255,255,255,0.3)',
+                    color: '#ffffff',
                     padding: '7px',
                     borderRadius: '50%',
                     cursor: 'pointer',
@@ -231,8 +231,8 @@ const TopAppBar = () => {
                     transition: 'background 0.2s',
                     flexShrink: 0,
                 }}
-                onMouseEnter={e => { e.currentTarget.style.background = '#f9c4c4'; }}
-                onMouseLeave={e => { e.currentTarget.style.background = 'var(--accent-red-light)'; }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.28)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'rgba(255,255,255,0.18)'; }}
             >
                 <LogOut size={15} />
             </button>

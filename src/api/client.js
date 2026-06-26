@@ -118,6 +118,10 @@ export const userAPI = {
     updateProfile: async (profileData) => {
         const response = await apiClient.post('/user/update-profile', profileData);
         return response.data;
+    },
+    deleteAccount: async () => {
+        const response = await apiClient.delete('/user/delete');
+        return response.data;
     }
 };
 
