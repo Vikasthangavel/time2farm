@@ -68,6 +68,41 @@ export const AuthProvider = ({ children }) => {
         return false;
     };
 
+    /**
+     * Called after Google credential is obtained.
+     * Returns { success, needs_profile, google_email, google_name, google_sub }
+     * If needs_profile is false, the user is already logged in.
+     */
+    const googleLogin = async (idToken) => {
+        const response = await authAPI.googleAuth(idToken);
+        if (response.success && !response.needs_profile && response.user) {
+            setUser(response.user);
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(response.user));
+            if (response.token) {
+                localStorage.setItem(AUTH_TOKEN_KEY, response.token);
+                setAuthToken(response.token);
+            }
+        }
+        return response; // let caller inspect needs_profile
+    };
+
+    /**
+     * Called after new Google user fills in their username/farm details.
+     */
+    const googleComplete = async (profileData) => {
+        const response = await authAPI.googleComplete(profileData);
+        if (response.success && response.user) {
+            setUser(response.user);
+            localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(response.user));
+            if (response.token) {
+                localStorage.setItem(AUTH_TOKEN_KEY, response.token);
+                setAuthToken(response.token);
+            }
+            return true;
+        }
+        return false;
+    };
+
     const logout = async () => {
         try {
             await authAPI.logout();
@@ -80,7 +115,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, login, logout, loading }}>
+        <AuthContext.Provider value={{ user, login, googleLogin, googleComplete, logout, loading }}>
             {children}
         </AuthContext.Provider>
     );

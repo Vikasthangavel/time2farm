@@ -55,7 +55,15 @@ export const authAPI = {
     restoreSession: async (token) => {
         const response = await apiClient.post('/session/restore', { token });
         return response.data;
-    }
+    },
+    googleAuth: async (idToken) => {
+        const response = await apiClient.post('/auth/google', { id_token: idToken });
+        return response.data;
+    },
+    googleComplete: async (profileData) => {
+        const response = await apiClient.post('/auth/google/complete', profileData);
+        return response.data;
+    },
 };
 
 export const dashboardAPI = {
