@@ -1,5 +1,5 @@
 import React from 'react';
-import { Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { Home, PlusCircle, LineChart, User, LogOut, History } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ChatWidget from './ChatWidget';
@@ -143,6 +143,11 @@ const Sidebar = () => {
                     <LogOut size={18} />
                     Logout
                 </button>
+                <div style={{ marginTop: '1rem', textAlign: 'center', fontSize: '0.7rem', color: 'var(--text-muted)' }}>
+                    <Link to="/terms-and-conditions" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Terms</Link>
+                    {' • '}
+                    <Link to="/privacy-policy" style={{ color: 'var(--text-muted)', textDecoration: 'none' }}>Privacy</Link>
+                </div>
             </div>
         </aside>
     );

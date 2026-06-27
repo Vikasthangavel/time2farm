@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { authAPI } from '../api/client';
 import Button from '../components/Button';
@@ -293,6 +293,9 @@ const Register = () => {
                         >
                             Sign in
                         </span>
+                    </p>
+                    <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                        By creating an account, you agree to our <Link to="/terms-and-conditions" style={{ color: 'var(--primary-color)' }}>Terms & Conditions</Link> and <Link to="/privacy-policy" style={{ color: 'var(--primary-color)' }}>Privacy Policy</Link>.
                     </p>
                 </div>
             </div>
