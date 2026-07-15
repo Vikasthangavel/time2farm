@@ -229,6 +229,34 @@ export const INDIAN_STATES = [
     'Lakshadweep', 'Puducherry',
 ];
 
+export const tasksAPI = {
+    getTasks: async (params = {}) => {
+        const query = new URLSearchParams(params).toString();
+        const response = await apiClient.get(`/tasks${query ? '?' + query : ''}`);
+        return response.data;
+    },
+    getUpcoming: async (days = 7) => {
+        const response = await apiClient.get(`/tasks/upcoming?days=${days}`);
+        return response.data;
+    },
+    createTask: async (taskData) => {
+        const response = await apiClient.post('/tasks', taskData);
+        return response.data;
+    },
+    getTask: async (taskId) => {
+        const response = await apiClient.get(`/tasks/${taskId}`);
+        return response.data;
+    },
+    updateTask: async (taskId, data) => {
+        const response = await apiClient.put(`/tasks/${taskId}`, data);
+        return response.data;
+    },
+    deleteTask: async (taskId) => {
+        const response = await apiClient.delete(`/tasks/${taskId}`);
+        return response.data;
+    },
+};
+
 export const reportsAPI = {
     generateReport: async () => {
         const response = await apiClient.get('/reports/generate', {

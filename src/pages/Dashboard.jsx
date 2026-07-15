@@ -4,7 +4,7 @@ import { dashboardAPI } from '../api/client';
 import {
     TrendingUp, TrendingDown, DollarSign, Layers,
     Camera, Map, Bot, History, FileText, Settings, HelpCircle,
-    Lightbulb, Zap, ArrowRight, Store
+    Lightbulb, Zap, ArrowRight, Store, Bell, Calendar as CalendarIcon
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -147,14 +147,14 @@ const Dashboard = () => {
                     </span>
                 </div>
                 <div className="actions-grid">
-                    <ActionGridItem icon={Camera}      label="Record Sale"   path="/record-sale"  color="var(--primary-color)" />
-                    <ActionGridItem icon={DollarSign}  label="Add Expense"   path="/add-expense"  color="var(--accent-orange)" />
-                    <ActionGridItem icon={Map}         label="Farm Areas"    path="/sections"     color="#8b5cf6" />
-                    <ActionGridItem icon={Bot}         label="AI Helper"     path="/ai-assistant" color="#06b6d4" />
-                    <ActionGridItem icon={History}     label="View Records"  path="/transactions" color="var(--text-body)" />
-                    <ActionGridItem icon={FileText}    label="Reports"       path="/reports"      color="var(--primary-color)" />
-                    <ActionGridItem icon={Settings}    label="Settings"      path="/profile"      color="var(--text-muted)" />
-                    <ActionGridItem icon={Store}       label="Mandi Rates"   path="/mandi-prices" color="var(--primary-dark)" />
+                    <ActionGridItem icon={Camera}       label="Record Sale"   path="/record-sale"    color="var(--primary-color)" />
+                    <ActionGridItem icon={DollarSign}   label="Add Expense"   path="/add-expense"    color="var(--accent-orange)" />
+                    <ActionGridItem icon={Bell}         label="Tasks"         path="/task-reminders" color="var(--primary-color)" />
+                    <ActionGridItem icon={CalendarIcon} label="Calendar"      path="/calendar"       color="#6366f1" />
+                    <ActionGridItem icon={Map}          label="Farm Areas"    path="/sections"       color="#8b5cf6" />
+                    <ActionGridItem icon={Bot}          label="AI Helper"     path="/ai-assistant"   color="#06b6d4" />
+                    <ActionGridItem icon={FileText}     label="Reports"       path="/reports"        color="var(--primary-color)" />
+                    <ActionGridItem icon={Store}        label="Mandi Rates"   path="/mandi-prices"   color="var(--primary-dark)" />
                 </div>
             </div>
 

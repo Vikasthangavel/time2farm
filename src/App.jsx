@@ -16,6 +16,8 @@ import AIAssistant from './pages/AIAssistant';
 import Reports from './pages/Reports';
 import ReportDownload from './pages/ReportDownload';
 import MandiPrices from './pages/MandiPrices';
+import TaskReminders from './pages/TaskReminders';
+import Calendar from './pages/Calendar';
 import DeleteAccountPublic from './pages/DeleteAccountPublic';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
@@ -62,6 +64,8 @@ function AppRoutes() {
         <Route path="/reports" element={<Reports />} />
         <Route path="/reports/download" element={<ReportDownload />} />
         <Route path="/mandi-prices" element={<MandiPrices />} />
+        <Route path="/task-reminders" element={<TaskReminders />} />
+        <Route path="/calendar" element={<Calendar />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
