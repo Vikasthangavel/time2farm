@@ -304,31 +304,38 @@ const TransactionsHistory = () => {
 
     useEffect(() => { fetchData(); }, [fetchData]);
 
-    /* Metrics for Paid and Yet to Pay */
-    const paidRecords = allTransactions.filter(t => t.payment_status === 'paid');
-    const yetToPayRecords = allTransactions.filter(t => t.payment_status === 'yet_to_pay' || (!t.payment_status && t.transaction_type === 'sale'));
+    /* Financial Overview Calculations */
+    const salesRecords = allTransactions.filter(t => t.transaction_type === 'sale');
+    const expenseRecords = allTransactions.filter(t => t.transaction_type === 'expense');
 
-    const paidCount = paidRecords.length;
-    const paidTotal = paidRecords.reduce((s, t) => s + Number(t.amount || 0), 0);
+    // Total income and expenses across all transactions
+    const totalIncome = salesRecords.reduce((s, t) => s + Number(t.amount || 0), 0);
+    const totalExpenses = expenseRecords.reduce((s, t) => s + Number(t.amount || 0), 0);
+    const netProfit = totalIncome - totalExpenses;
 
-    const yetToPayCount = yetToPayRecords.length;
-    const yetToPayTotal = yetToPayRecords.reduce((s, t) => s + Number(t.amount || 0), 0);
+    // 1. To Collect (Needed to pay by others) -> Unpaid sales
+    const toCollectRecords = salesRecords.filter(t => t.payment_status === 'yet_to_pay');
+    const toCollectCount = toCollectRecords.length;
+    const toCollectTotal = toCollectRecords.reduce((s, t) => s + Number(t.amount || 0), 0);
+
+    // 2. To Pay (Needed to pay me to others) -> Unpaid expenses
+    const toPayRecords = expenseRecords.filter(t => t.payment_status === 'yet_to_pay');
+    const toPayCount = toPayRecords.length;
+    const toPayTotal = toPayRecords.reduce((s, t) => s + Number(t.amount || 0), 0);
 
     /* Apply filters */
     const filtered = allTransactions.filter(t => {
         let typeOk = true;
         if (typeFilter === 'sale') typeOk = t.transaction_type === 'sale';
         else if (typeFilter === 'expense') typeOk = t.transaction_type === 'expense';
+        else if (typeFilter === 'to_collect') typeOk = t.transaction_type === 'sale' && t.payment_status === 'yet_to_pay';
+        else if (typeFilter === 'to_pay') typeOk = t.transaction_type === 'expense' && t.payment_status === 'yet_to_pay';
         else if (typeFilter === 'paid') typeOk = t.payment_status === 'paid';
-        else if (typeFilter === 'yet_to_pay') typeOk = t.payment_status === 'yet_to_pay' || (!t.payment_status && t.transaction_type === 'sale');
+        else if (typeFilter === 'yet_to_pay') typeOk = t.payment_status === 'yet_to_pay';
 
         const secOk = sectionFilter === 'all' || String(t.section_id) === String(sectionFilter);
         return typeOk && secOk;
     });
-
-    /* Summary for active filter */
-    const totalEarned = filtered.filter(t => t.transaction_type === 'sale').reduce((s, t) => s + Number(t.amount || 0), 0);
-    const totalSpent  = filtered.filter(t => t.transaction_type === 'expense').reduce((s, t) => s + Number(t.amount || 0), 0);
 
     /* Edit handler */
     const handleSave = async (id, payload) => {
@@ -393,48 +400,63 @@ const TransactionsHistory = () => {
                 </div>
             </div>
 
-            {/* Payment Status Metric cards */}
+            {/* Payment & Pending Balance Cards */}
             {!loading && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                     <div 
-                        onClick={() => setTypeFilter('paid')}
+                        onClick={() => setTypeFilter(typeFilter === 'to_collect' ? 'all' : 'to_collect')}
                         style={{ 
-                            background: '#f0fdf4', borderRadius: '12px', padding: '0.875rem', 
-                            borderLeft: '4px solid #16a34a', cursor: 'pointer',
+                            background: typeFilter === 'to_collect' ? '#dcfce7' : '#f0fdf4', borderRadius: '12px', padding: '0.875rem', 
+                            borderLeft: '4px solid #16a34a', cursor: 'pointer', transition: 'all 0.2s ease',
+                            boxShadow: typeFilter === 'to_collect' ? '0 0 0 2px #16a34a' : 'none'
                         }}
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                            <span style={{ fontSize: '0.72rem', color: '#15803d', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Paid Sales</span>
-                            <span style={{ fontSize: '0.7rem', fontWeight: 700, background: '#dcfce7', color: '#15803d', padding: '1px 7px', borderRadius: '10px' }}>{paidCount}</span>
+                            <span style={{ fontSize: '0.72rem', color: '#15803d', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                To Collect
+                            </span>
+                        
                         </div>
-                        <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#16a34a' }}>₹{paidTotal.toLocaleString()}</div>
+                        <div style={{ fontWeight: 800, fontSize: '1.25rem', color: '#15803d' }}>₹{toCollectTotal.toLocaleString()}</div>
+                       
                     </div>
+
                     <div 
-                        onClick={() => setTypeFilter('yet_to_pay')}
+                        onClick={() => setTypeFilter(typeFilter === 'to_pay' ? 'all' : 'to_pay')}
                         style={{ 
-                            background: '#fff7ed', borderRadius: '12px', padding: '0.875rem', 
-                            borderLeft: '4px solid #ea580c', cursor: 'pointer',
+                            background: typeFilter === 'to_pay' ? '#ffedd5' : '#fff7ed', borderRadius: '12px', padding: '0.875rem', 
+                            borderLeft: '4px solid #ea580c', cursor: 'pointer', transition: 'all 0.2s ease',
+                            boxShadow: typeFilter === 'to_pay' ? '0 0 0 2px #ea580c' : 'none'
                         }}
                     >
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
-                            <span style={{ fontSize: '0.72rem', color: '#c2410c', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Yet to Pay</span>
-                            <span style={{ fontSize: '0.7rem', fontWeight: 700, background: '#ffedd5', color: '#c2410c', padding: '1px 7px', borderRadius: '10px' }}>{yetToPayCount}</span>
+                            <span style={{ fontSize: '0.72rem', color: '#c2410c', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+                                To Pay
+                            </span>
+                        
                         </div>
-                        <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#ea580c' }}>₹{yetToPayTotal.toLocaleString()}</div>
+                        <div style={{ fontWeight: 800, fontSize: '1.25rem', color: '#c2410c' }}>₹{toPayTotal.toLocaleString()}</div>
+                       
                     </div>
                 </div>
             )}
 
-            {/* Financial Overview cards */}
+            {/* Overall Financial Totals cards */}
             {!loading && (
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
-                    <div style={{ background: 'var(--primary-50)', borderRadius: '12px', padding: '0.875rem', borderLeft: '3px solid var(--primary-color)' }}>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 500, marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Total Income</div>
-                        <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--primary-dark)' }}>₹{totalEarned.toLocaleString()}</div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0.75rem' }}>
+                    <div style={{ background: 'var(--primary-50)', borderRadius: '12px', padding: '0.75rem', borderLeft: '3px solid var(--primary-color)' }}>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Total Income</div>
+                        <div style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--primary-dark)' }}>₹{totalIncome.toLocaleString()}</div>
                     </div>
-                    <div style={{ background: 'var(--accent-orange-light)', borderRadius: '12px', padding: '0.875rem', borderLeft: '3px solid var(--accent-orange)' }}>
-                        <div style={{ fontSize: '0.72rem', color: 'var(--text-muted)', fontWeight: 500, marginBottom: '4px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Total Expense</div>
-                        <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--accent-orange)' }}>₹{totalSpent.toLocaleString()}</div>
+                    <div style={{ background: 'var(--accent-orange-light)', borderRadius: '12px', padding: '0.75rem', borderLeft: '3px solid var(--accent-orange)' }}>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Total Expense</div>
+                        <div style={{ fontWeight: 700, fontSize: '1.05rem', color: 'var(--accent-orange)' }}>₹{totalExpenses.toLocaleString()}</div>
+                    </div>
+                    <div style={{ background: netProfit >= 0 ? '#f0fdf4' : '#fef2f2', borderRadius: '12px', padding: '0.75rem', borderLeft: `3px solid ${netProfit >= 0 ? '#16a34a' : '#dc2626'}` }}>
+                        <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', fontWeight: 600, marginBottom: '2px', textTransform: 'uppercase', letterSpacing: '0.04em' }}>Net Profit</div>
+                        <div style={{ fontWeight: 700, fontSize: '1.05rem', color: netProfit >= 0 ? '#15803d' : '#b91c1c' }}>
+                            {netProfit >= 0 ? '+' : ''}₹{netProfit.toLocaleString()}
+                        </div>
                     </div>
                 </div>
             )}
@@ -470,8 +492,8 @@ const TransactionsHistory = () => {
             <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '4px' }}>
                 {[
                     { key: 'all', label: 'All Records' },
-                    { key: 'paid', label: `Paid (${paidCount})` },
-                    { key: 'yet_to_pay', label: `Yet to Pay (${yetToPayCount})` },
+                    { key: 'to_collect', label: `To Collect (${toCollectCount})` },
+                    { key: 'to_pay', label: `To Pay (${toPayCount})` },
                     { key: 'sale', label: 'Sales Only' },
                     { key: 'expense', label: 'Expenses Only' },
                 ].map(f => (
