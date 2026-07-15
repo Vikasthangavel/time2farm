@@ -1,18 +1,10 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { 
   Search, X, TrendingUp, TrendingDown, MapPin, ChevronDown, 
-  RefreshCw, AlertCircle, CheckCircle, Minus, Store, Calendar
+  RefreshCw, AlertCircle, CheckCircle, Minus, Store, Calendar,
+  Sprout, Building2, Tag, BarChart2, Info
 } from 'lucide-react';
 import { mandiAPI, POPULAR_COMMODITIES, INDIAN_STATES, userAPI } from '../api/client';
-
-/* Commodity Emoji Map */
-const COMMODITY_EMOJI = {
-  Tomato: '🍅', Onion: '🧅', Potato: '🥔', Rice: '🌾', Wheat: '🌾',
-  Maize: '🌽', Cotton: '🏵️', Groundnut: '🥜', Soyabean: '🫘',
-  Turmeric: '🟡', Chilli: '🌶️', Garlic: '🧄', Ginger: '🫚',
-  Banana: '🍌', Mango: '🥭', Sugarcane: '🎋', Coconut: '🥥',
-  Brinjal: '🍆', Cabbage: '🥬', Cauliflower: '🥦',
-};
 
 /* Price Trend Helper */
 function getPriceTrend(min, max) {
@@ -30,7 +22,7 @@ const HistoryModal = ({ record, onClose }) => {
   const baseMin = parseFloat(record.min_price) || (baseModal * 0.9);
   const baseMax = parseFloat(record.max_price) || (baseModal * 1.1);
 
-  // Generate 5-day simulated history matching mobile app logic
+  // Generate 5-day simulated history matching app logic
   const seedString = `${record.market}-${record.commodity}-${record.variety || ''}`;
   let seed = 0;
   for (let i = 0; i < seedString.length; i++) seed += seedString.charCodeAt(i);
@@ -67,77 +59,100 @@ const HistoryModal = ({ record, onClose }) => {
   const oldestModal = history[0].modal;
   const latestModal = history[4].modal;
   const pctChange = parseFloat(((latestModal - oldestModal) / oldestModal * 100).toFixed(1));
-  const emoji = COMMODITY_EMOJI[record.commodity] || '🌿';
 
   return (
     <div style={{
       position: 'fixed', inset: 0, zIndex: 1000,
-      backgroundColor: 'rgba(0,0,0,0.5)', backdropFilter: 'blur(3px)',
+      backgroundColor: 'rgba(15, 23, 42, 0.55)', backdropFilter: 'blur(4px)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem'
     }} onClick={onClose}>
       <div style={{
-        background: '#fff', borderRadius: '16px', maxWidth: '520px', width: '100%',
-        padding: '1.5rem', boxShadow: 'var(--shadow-lg)', animation: 'slideUp 0.25s ease-out'
+        background: '#ffffff', borderRadius: '16px', maxWidth: '540px', width: '100%',
+        padding: '1.75rem', boxShadow: 'var(--shadow-lg)', animation: 'slideUp 0.25s ease-out'
       }} onClick={(e) => e.stopPropagation()}>
         
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '0.85rem' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-            <span style={{ fontSize: '2rem' }}>{emoji}</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem', borderBottom: '1px solid var(--border-color)', paddingBottom: '1rem' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.85rem' }}>
+            <div style={{ 
+              width: '44px', height: '44px', borderRadius: '12px', background: 'var(--primary-50)', 
+              color: 'var(--primary-dark)', display: 'flex', alignItems: 'center', justifyContent: 'center',
+              border: '1px solid var(--primary-100)'
+            }}>
+              <Sprout size={24} />
+            </div>
             <div>
-              <h3 style={{ fontSize: '1.15rem', fontWeight: 700, color: 'var(--text-dark)' }}>
-                {record.commodity} <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)', fontWeight: 400 }}>({record.variety || 'Local'})</span>
+              <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-dark)', margin: 0 }}>
+                {record.commodity}
               </h3>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-                <MapPin size={13} /> {record.market}, {record.district}
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.825rem', color: 'var(--text-muted)', marginTop: '2px' }}>
+                <span>Variety: <strong>{record.variety || 'Standard Local'}</strong></span>
+                <span>•</span>
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                  <Building2 size={13} /> {record.market}, {record.district}
+                </span>
               </div>
             </div>
           </div>
-          <button onClick={onClose} style={{ background: 'var(--primary-50)', color: 'var(--text-dark)', padding: '6px', borderRadius: '50%', border: 'none' }}>
+          <button onClick={onClose} aria-label="Close modal" style={{ background: 'var(--bg-main)', color: 'var(--text-muted)', padding: '6px', borderRadius: '50%', border: '1px solid var(--border-color)', cursor: 'pointer' }}>
             <X size={18} />
           </button>
         </div>
 
-        {/* Rate summary */}
-        <div style={{ background: 'var(--primary-50)', padding: '1rem 1.25rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+        {/* Rate Summary Card */}
+        <div style={{ background: 'var(--primary-50)', border: '1px solid var(--primary-100)', padding: '1.15rem 1.25rem', borderRadius: '12px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
           <div>
-            <div style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--primary-dark)', textTransform: 'uppercase' }}>Today's Modal Rate</div>
-            <div style={{ fontSize: '1.75rem', fontWeight: 800, color: 'var(--primary-dark)' }}>₹{baseModal.toLocaleString('en-IN')}<span style={{ fontSize: '0.85rem', fontWeight: 500 }}> / quintal</span></div>
+            <div style={{ fontSize: '0.725rem', fontWeight: 700, color: 'var(--primary-dark)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Today's Average Market Rate</div>
+            <div style={{ fontSize: '1.85rem', fontWeight: 800, color: 'var(--primary-dark)', margin: '2px 0 0' }}>
+              ₹{baseModal.toLocaleString('en-IN')}
+              <span style={{ fontSize: '0.85rem', fontWeight: 500, color: 'var(--text-muted)', marginLeft: '6px' }}>/ quintal (100 kg)</span>
+            </div>
           </div>
           <div style={{ textAlign: 'right' }}>
             <div style={{ 
-              display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '4px 10px', borderRadius: '20px',
+              display: 'inline-flex', alignItems: 'center', gap: '4px', padding: '5px 12px', borderRadius: '20px',
               backgroundColor: pctChange >= 0 ? 'rgba(74,158,63,0.15)' : 'rgba(217,64,64,0.15)',
               color: pctChange >= 0 ? 'var(--primary-dark)' : 'var(--accent-red)', fontWeight: 700, fontSize: '0.85rem'
             }}>
-              {pctChange >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+              {pctChange >= 0 ? <TrendingUp size={15} /> : <TrendingDown size={15} />}
               {pctChange >= 0 ? '+' : ''}{pctChange}%
             </div>
-            <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', marginTop: '4px' }}>5-day trend</div>
+            <div style={{ fontSize: '0.725rem', color: 'var(--text-muted)', marginTop: '4px', fontWeight: 500 }}>5-Day Market Change</div>
           </div>
         </div>
 
-        {/* 5-day table */}
-        <h4 style={{ fontSize: '0.9rem', fontWeight: 700, marginBottom: '0.75rem', color: 'var(--text-dark)' }}>Daily Rate History</h4>
+        {/* 5-Day Rate History Table */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.65rem' }}>
+          <h4 style={{ fontSize: '0.9rem', fontWeight: 700, color: 'var(--text-dark)', margin: 0, display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <BarChart2 size={16} color="var(--primary-color)" /> Recent 5-Day Rate History
+          </h4>
+          <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Prices in ₹ / Quintal</span>
+        </div>
+
         <div style={{ border: '1px solid var(--border-color)', borderRadius: '10px', overflow: 'hidden' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr', padding: '8px 12px', background: 'var(--bg-main)', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr', padding: '10px 14px', background: 'var(--bg-main)', fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', borderBottom: '1px solid var(--border-color)' }}>
             <div>Date</div>
-            <div style={{ textAlign: 'center' }}>Lowest</div>
-            <div style={{ textAlign: 'center', color: 'var(--primary-dark)' }}>Modal</div>
-            <div style={{ textAlign: 'center' }}>Highest</div>
+            <div style={{ textAlign: 'center' }}>Lowest Price</div>
+            <div style={{ textAlign: 'center', color: 'var(--primary-dark)' }}>Average (Modal)</div>
+            <div style={{ textAlign: 'center' }}>Highest Price</div>
           </div>
           {[...history].reverse().map((h, idx) => (
             <div key={idx} style={{ 
-              display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr', padding: '10px 12px', 
-              borderTop: '1px solid var(--border-color)', fontSize: '0.85rem',
-              background: idx === 0 ? 'var(--primary-50)' : '#fff'
+              display: 'grid', gridTemplateColumns: '1.2fr 1fr 1fr 1fr', padding: '11px 14px', 
+              borderTop: idx === 0 ? 'none' : '1px solid var(--border-color)', fontSize: '0.85rem',
+              background: idx === 0 ? 'var(--primary-50)' : '#ffffff'
             }}>
               <div style={{ fontWeight: idx === 0 ? 700 : 500, color: idx === 0 ? 'var(--primary-dark)' : 'var(--text-dark)' }}>{h.date}</div>
-              <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>₹{h.min.toLocaleString('en-IN')}</div>
+              <div style={{ textAlign: 'center', color: 'var(--text-body)' }}>₹{h.min.toLocaleString('en-IN')}</div>
               <div style={{ textAlign: 'center', fontWeight: 700, color: 'var(--primary-dark)' }}>₹{h.modal.toLocaleString('en-IN')}</div>
-              <div style={{ textAlign: 'center', color: 'var(--text-muted)' }}>₹{h.max.toLocaleString('en-IN')}</div>
+              <div style={{ textAlign: 'center', color: 'var(--text-body)' }}>₹{h.max.toLocaleString('en-IN')}</div>
             </div>
           ))}
+        </div>
+
+        <div style={{ display: 'flex', alignItems: 'center', gap: '6px', fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: '1rem', background: 'var(--bg-main)', padding: '8px 12px', borderRadius: '8px' }}>
+          <Info size={14} style={{ flexShrink: 0, color: 'var(--primary-color)' }} />
+          <span>Rates are officially provided per quintal (1 Quintal = 100 Kilograms).</span>
         </div>
 
       </div>
@@ -209,43 +224,48 @@ export default function MandiPrices() {
   return (
     <div className="page-wrapper animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
       
-      {/* Header Banner */}
+      {/* Professional Header Banner */}
       <div className="card" style={{ 
-        background: 'linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%)', 
-        color: '#fff', padding: '1.5rem', borderRadius: '16px', position: 'relative', overflow: 'hidden'
+        background: 'linear-gradient(135deg, var(--primary-dark) 0%, #1e4d1a 100%)', 
+        color: '#ffffff', padding: '1.5rem 1.75rem', borderRadius: '16px', position: 'relative', overflow: 'hidden',
+        border: 'none', boxShadow: 'var(--shadow-md)'
       }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', position: 'relative', zIndex: 1 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
-              <Store size={22} />
-              <h1 style={{ color: '#fff', fontSize: '1.5rem', fontWeight: 800 }}>Mandi Prices</h1>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
+              <div style={{ width: '36px', height: '36px', borderRadius: '10px', background: 'rgba(255,255,255,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <Store size={20} color="#ffffff" />
+              </div>
+              <h1 style={{ color: '#ffffff', fontSize: '1.4rem', fontWeight: 800, margin: 0 }}>
+                Government Mandi Market Prices
+              </h1>
             </div>
-            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.875rem' }}>
-              Live market commodity rates powered by AGMARKNET
+            <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.875rem', margin: 0, fontWeight: 400 }}>
+              Live crop market rates published daily by AGMARKNET (Govt. of India)
             </p>
           </div>
           {records.length > 0 && (
-            <div style={{ background: 'rgba(255,255,255,0.2)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600 }}>
+            <div style={{ background: 'rgba(255,255,255,0.18)', border: '1px solid rgba(255,255,255,0.3)', padding: '6px 14px', borderRadius: '20px', fontSize: '0.8rem', fontWeight: 600 }}>
               {records.length} Markets Found
             </div>
           )}
         </div>
       </div>
 
-      {/* Filters Bar */}
-      <div className="card" style={{ padding: '1.25rem' }}>
+      {/* Search & Location Filters Panel */}
+      <div className="card" style={{ padding: '1.5rem' }}>
         
-        {/* State & District Filters */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
+        {/* State & District Inputs */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1.25rem', marginBottom: '1.25rem' }}>
           <div>
-            <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>State</label>
+            <label style={{ fontSize: '0.825rem', fontWeight: 600, color: 'var(--text-dark)', marginBottom: '0.4rem' }}>Select State</label>
             <div style={{ position: 'relative' }}>
               <select 
                 value={state} 
                 onChange={(e) => setState(e.target.value)}
-                style={{ appearance: 'none', paddingRight: '2.2rem' }}
+                style={{ appearance: 'none', paddingRight: '2.2rem', fontWeight: 500 }}
               >
-                <option value="">All India</option>
+                <option value="">All India (All States)</option>
                 {INDIAN_STATES.map(s => <option key={s} value={s}>{s}</option>)}
               </select>
               <ChevronDown size={16} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', pointerEvents: 'none', color: 'var(--text-muted)' }} />
@@ -253,14 +273,15 @@ export default function MandiPrices() {
           </div>
 
           <div>
-            <label style={{ fontSize: '0.8rem', fontWeight: 600 }}>District (Optional)</label>
+            <label style={{ fontSize: '0.825rem', fontWeight: 600, color: 'var(--text-dark)', marginBottom: '0.4rem' }}>District (Optional)</label>
             <div style={{ position: 'relative' }}>
               <input 
                 type="text" 
-                placeholder="e.g. Salem, Namakkal"
+                placeholder="Type district name (e.g. Salem)"
                 value={district}
                 onChange={(e) => setDistrict(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && doFetch()}
+                style={{ fontWeight: 500 }}
               />
               {district && (
                 <X size={16} onClick={() => setDistrict('')} style={{ position: 'absolute', right: '12px', top: '50%', transform: 'translateY(-50%)', cursor: 'pointer', color: 'var(--text-muted)' }} />
@@ -272,34 +293,34 @@ export default function MandiPrices() {
             <button 
               onClick={() => doFetch()} 
               disabled={loading}
-              style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', height: '42px' }}
+              style={{ width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '8px', height: '42px', fontWeight: 600 }}
             >
               {loading ? <RefreshCw className="spin" size={16} /> : <Search size={16} />}
-              <span>Search Rates</span>
+              <span>View Market Prices</span>
             </button>
           </div>
         </div>
 
         {/* Location auto-detected helper */}
         {(autoState || autoDistrict) && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', background: 'var(--primary-50)', padding: '6px 12px', borderRadius: '8px', color: 'var(--primary-dark)' }}>
-            <CheckCircle size={14} />
-            <span>Profile Location: <strong>{[autoDistrict, autoState].filter(Boolean).join(', ')}</strong></span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.8rem', background: 'var(--primary-50)', border: '1px solid var(--primary-100)', padding: '8px 14px', borderRadius: '8px', color: 'var(--primary-dark)' }}>
+            <CheckCircle size={15} style={{ flexShrink: 0 }} />
+            <span>Your Farm Location: <strong>{[autoDistrict, autoState].filter(Boolean).join(', ')}</strong></span>
             {(state !== autoState || district !== autoDistrict) && (
               <button 
                 onClick={handleResetLocation} 
-                style={{ marginLeft: 'auto', background: 'var(--primary-color)', color: '#fff', border: 'none', padding: '2px 8px', borderRadius: '6px', fontSize: '0.72rem', cursor: 'pointer' }}
+                style={{ marginLeft: 'auto', background: 'var(--primary-color)', color: '#ffffff', border: 'none', padding: '4px 10px', borderRadius: '6px', fontSize: '0.75rem', fontWeight: 600, cursor: 'pointer' }}
               >
-                Reset to My Location
+                Reset Location
               </button>
             )}
           </div>
         )}
 
-        {/* Commodity Selector Chips */}
+        {/* Major Crops Selection Pills */}
         <div style={{ marginTop: '1.25rem' }}>
-          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.5rem', letterSpacing: '0.5px' }}>
-            Popular Crops
+          <div style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '0.65rem', letterSpacing: '0.5px' }}>
+            Quick Filter By Crop Name
           </div>
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
             {POPULAR_COMMODITIES.map(c => {
@@ -310,14 +331,15 @@ export default function MandiPrices() {
                   onClick={() => selectCommodity(c)}
                   style={{
                     display: 'inline-flex', alignItems: 'center', gap: '6px',
-                    padding: '6px 14px', borderRadius: '20px', fontSize: '0.85rem',
+                    padding: '6px 14px', borderRadius: '20px', fontSize: '0.825rem',
                     border: active ? '1.5px solid var(--primary-color)' : '1px solid var(--border-color)',
-                    background: active ? 'var(--primary-color)' : '#fff',
-                    color: active ? '#fff' : 'var(--text-dark)',
+                    background: active ? 'var(--primary-color)' : '#ffffff',
+                    color: active ? '#ffffff' : 'var(--text-dark)',
+                    fontWeight: active ? 600 : 500,
                     cursor: 'pointer', transition: 'all 0.15s'
                   }}
                 >
-                  <span>{COMMODITY_EMOJI[c] || '🌿'}</span>
+                  <Sprout size={13} color={active ? '#ffffff' : 'var(--primary-color)'} />
                   <span>{c}</span>
                 </button>
               );
@@ -327,107 +349,122 @@ export default function MandiPrices() {
 
       </div>
 
-      {/* Main Results Container */}
+      {/* Main Market Rate Results Grid */}
       {loading ? (
         <div className="card flex-center" style={{ padding: '4rem', flexDirection: 'column', gap: '1rem' }}>
           <RefreshCw className="spin" size={32} style={{ color: 'var(--primary-color)' }} />
-          <div style={{ color: 'var(--text-muted)', fontWeight: 500 }}>Fetching latest Mandi rates from AGMARKNET...</div>
+          <div style={{ color: 'var(--text-muted)', fontWeight: 500, fontSize: '0.925rem' }}>Loading official Mandi price data...</div>
         </div>
       ) : error ? (
         <div className="card flex-center" style={{ padding: '3rem', flexDirection: 'column', gap: '1rem', textAlign: 'center' }}>
           <AlertCircle size={40} style={{ color: 'var(--accent-red)' }} />
-          <div style={{ fontWeight: 700, fontSize: '1.1rem' }}>Unable to load mandi prices</div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>{error}</div>
+          <div style={{ fontWeight: 700, fontSize: '1.1rem', color: 'var(--text-dark)' }}>Unable to load mandi rates</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', maxWidth: '400px' }}>{error}</div>
           <button onClick={() => doFetch()} style={{ marginTop: '0.5rem' }}>Try Again</button>
         </div>
       ) : !searched ? (
         <div className="card flex-center" style={{ padding: '4rem 2rem', flexDirection: 'column', gap: '0.75rem', textAlign: 'center' }}>
           <Store size={48} style={{ color: 'var(--primary-light)', opacity: 0.8 }} />
-          <div style={{ fontWeight: 700, fontSize: '1.15rem' }}>Select a Crop or Location above</div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', maxWidth: '420px' }}>
-            View real-time prices per quintal (100 kg) across agricultural markets in India.
+          <div style={{ fontWeight: 700, fontSize: '1.15rem', color: 'var(--text-dark)' }}>Select a Crop or Search Location Above</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', maxWidth: '460px', lineHeight: 1.5 }}>
+            Rates are updated daily directly from central agricultural wholesale mandis across India (calculated per 100 kg quintal).
           </div>
         </div>
       ) : records.length === 0 ? (
-        <div className="card flex-center" style={{ padding: '3rem', flexDirection: 'column', gap: '0.5rem', textAlign: 'center' }}>
+        <div className="card flex-center" style={{ padding: '3.5rem', flexDirection: 'column', gap: '0.65rem', textAlign: 'center' }}>
           <Search size={36} style={{ color: 'var(--text-muted)' }} />
-          <div style={{ fontWeight: 700, fontSize: '1rem' }}>No price records found</div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>Try clearing the district filter or selecting a different crop.</div>
+          <div style={{ fontWeight: 700, fontSize: '1rem', color: 'var(--text-dark)' }}>No market rates found</div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>Please select a different crop or clear the district search filter.</div>
         </div>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '1rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(290px, 1fr))', gap: '1.15rem' }}>
           {records.map((record, index) => {
             const modal = parseFloat(record.modal_price) || 0;
             const min = parseFloat(record.min_price) || 0;
             const max = parseFloat(record.max_price) || 0;
             const trend = getPriceTrend(min, max);
-            const emoji = COMMODITY_EMOJI[record.commodity] || '🌿';
 
             return (
               <div 
                 key={index} 
                 className="card hoverable" 
                 onClick={() => setSelectedRecord(record)}
-                style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', margin: 0 }}
+                style={{ 
+                  cursor: 'pointer', display: 'flex', flexDirection: 'column', 
+                  justify: 'space-between', margin: 0, padding: '1.25rem',
+                  border: '1px solid var(--border-color)', borderRadius: '14px'
+                }}
               >
                 <div>
-                  {/* Top Header */}
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
+                  {/* Top Crop Header */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.85rem' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                      <span style={{ fontSize: '1.75rem' }}>{emoji}</span>
+                      <div style={{ 
+                        width: '38px', height: '38px', borderRadius: '10px', 
+                        background: 'var(--primary-50)', color: 'var(--primary-dark)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        border: '1px solid var(--primary-100)'
+                      }}>
+                        <Sprout size={20} />
+                      </div>
                       <div>
-                        <div style={{ fontWeight: 800, fontSize: '1rem', color: 'var(--text-dark)' }}>{record.commodity}</div>
-                        {record.variety && record.variety !== 'Other' && (
-                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{record.variety}</div>
+                        <div style={{ fontWeight: 800, fontSize: '1.05rem', color: 'var(--text-dark)' }}>
+                          {record.commodity}
+                        </div>
+                        {record.variety && (
+                          <div style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontWeight: 500 }}>
+                            Variety: {record.variety}
+                          </div>
                         )}
                       </div>
                     </div>
+
                     <span style={{ 
-                      fontSize: '0.7rem', fontWeight: 700, padding: '3px 8px', borderRadius: '12px',
+                      fontSize: '0.7rem', fontWeight: 700, padding: '3px 9px', borderRadius: '12px',
                       backgroundColor: trend === 'volatile' ? 'var(--accent-orange-light)' : 'var(--primary-50)',
                       color: trend === 'volatile' ? 'var(--accent-orange)' : 'var(--primary-dark)',
-                      display: 'inline-flex', alignItems: 'center', gap: '3px'
+                      display: 'inline-flex', alignItems: 'center', gap: '4px'
                     }}>
                       {trend === 'volatile' ? <TrendingUp size={12} /> : <Minus size={12} />}
-                      {trend === 'volatile' ? 'Volatile' : 'Stable'}
+                      {trend === 'volatile' ? 'Fluctuating' : 'Stable Rate'}
                     </span>
                   </div>
 
-                  {/* Modal Price Highlight */}
-                  <div style={{ background: 'var(--primary-50)', padding: '0.85rem', borderRadius: '10px', textAlign: 'center', marginBottom: '0.85rem' }}>
+                  {/* Highlighted Today's Rate */}
+                  <div style={{ background: 'var(--primary-50)', border: '1px solid var(--primary-100)', padding: '0.9rem', borderRadius: '10px', textAlign: 'center', marginBottom: '0.85rem' }}>
                     <div style={{ fontSize: '0.68rem', fontWeight: 700, color: 'var(--primary-dark)', textTransform: 'uppercase', letterSpacing: '0.5px' }}>
-                      Today's Rate (per quintal)
+                      Today's Average Rate (Per Quintal)
                     </div>
-                    <div style={{ fontSize: '1.6rem', fontWeight: 900, color: 'var(--primary-dark)' }}>
+                    <div style={{ fontSize: '1.65rem', fontWeight: 900, color: 'var(--primary-dark)', marginTop: '2px' }}>
                       ₹{modal.toLocaleString('en-IN')}
                     </div>
                   </div>
 
                   {/* Min / Max Range */}
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: 'var(--bg-main)', padding: '8px', borderRadius: '8px', textAlign: 'center', fontSize: '0.8rem', marginBottom: '0.85rem' }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', background: 'var(--bg-main)', padding: '8px 10px', borderRadius: '8px', textAlign: 'center', fontSize: '0.8rem', marginBottom: '0.85rem' }}>
                     <div>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
-                        <TrendingDown size={11} /> Lowest
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px', fontWeight: 500 }}>
+                        <TrendingDown size={11} /> Lowest Price
                       </div>
-                      <div style={{ fontWeight: 700, color: 'var(--text-dark)' }}>₹{min.toLocaleString('en-IN')}</div>
+                      <div style={{ fontWeight: 700, color: 'var(--text-dark)', marginTop: '2px' }}>₹{min.toLocaleString('en-IN')}</div>
                     </div>
                     <div style={{ borderLeft: '1px solid var(--border-color)' }}>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '2px' }}>
-                        <TrendingUp size={11} color="var(--accent-red)" /> Highest
+                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '3px', fontWeight: 500 }}>
+                        <TrendingUp size={11} color="var(--accent-red)" /> Highest Price
                       </div>
-                      <div style={{ fontWeight: 700, color: 'var(--accent-red)' }}>₹{max.toLocaleString('en-IN')}</div>
+                      <div style={{ fontWeight: 700, color: 'var(--accent-red)', marginTop: '2px' }}>₹{max.toLocaleString('en-IN')}</div>
                     </div>
                   </div>
                 </div>
 
-                {/* Footer / Location */}
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.75rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '0.65rem' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: '70%' }}>
-                    <MapPin size={13} style={{ flexShrink: 0 }} />
-                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{record.market}, {record.district}</span>
+                {/* Footer Info / Location */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.775rem', color: 'var(--text-muted)', borderTop: '1px solid var(--border-color)', paddingTop: '0.75rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', overflow: 'hidden', whiteSpace: 'nowrap', textOverflow: 'ellipsis', maxWidth: '65%' }}>
+                    <Building2 size={13} style={{ flexShrink: 0, color: 'var(--text-muted)' }} />
+                    <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', fontWeight: 500 }}>{record.market}, {record.district}</span>
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--primary-color)', fontWeight: 700, fontSize: '0.72rem' }}>
-                    📈 History
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--primary-color)', fontWeight: 700, fontSize: '0.75rem' }}>
+                    View 5-Day Trend →
                   </div>
                 </div>
               </div>
@@ -436,7 +473,7 @@ export default function MandiPrices() {
         </div>
       )}
 
-      {/* History Modal */}
+      {/* 5-Day Rate History Modal */}
       {selectedRecord && (
         <HistoryModal record={selectedRecord} onClose={() => setSelectedRecord(null)} />
       )}
