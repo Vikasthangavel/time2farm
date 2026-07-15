@@ -391,17 +391,27 @@ export default function TaskReminders() {
 
                     {/* Metadata tags */}
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', fontSize: '0.825rem', marginTop: '6px' }}>
-                      <span style={{ 
-                        display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: isOverdue ? 700 : 600,
-                        color: isOverdue ? 'var(--accent-red)' : days <= 3 ? 'var(--accent-orange)' : 'var(--text-dark)',
-                        background: isOverdue ? 'rgba(217,64,64,0.1)' : 'var(--bg-main)', padding: '2px 8px', borderRadius: '6px'
-                      }}>
-                        <CalendarDays size={14} />
-                        {fmtDate(task.due_date)}
-                        {days !== null && (
-                          isOverdue ? ` (${Math.abs(days)}d Overdue)` : days === 0 ? ' (Due Today!)' : ` (${days}d remaining)`
-                        )}
-                      </span>
+                      {task.status === 'done' ? (
+                        <span style={{ 
+                          display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: 500,
+                          color: 'var(--text-muted)', background: 'var(--bg-main)', padding: '2px 8px', borderRadius: '6px'
+                        }}>
+                          <CalendarDays size={14} />
+                          {fmtDate(task.due_date)}
+                        </span>
+                      ) : (
+                        <span style={{ 
+                          display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: isOverdue ? 700 : 600,
+                          color: isOverdue ? 'var(--accent-red)' : (days !== null && days <= 3 && days >= 0) ? 'var(--accent-orange)' : 'var(--text-dark)',
+                          background: isOverdue ? 'rgba(217,64,64,0.1)' : 'var(--bg-main)', padding: '2px 8px', borderRadius: '6px'
+                        }}>
+                          <CalendarDays size={14} />
+                          {fmtDate(task.due_date)}
+                          {days !== null && (
+                            isOverdue ? ` (${Math.abs(days)}d Overdue)` : days === 0 ? ' (Due Today!)' : days > 0 ? ` (${days}d remaining)` : ''
+                          )}
+                        </span>
+                      )}
 
                       {task.section_name && (
                         <span style={{ background: 'var(--bg-main)', padding: '2px 8px', borderRadius: '6px', border: '1px solid var(--border-color)', fontWeight: 600, color: 'var(--text-dark)' }}>
