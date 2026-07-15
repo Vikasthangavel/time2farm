@@ -17,6 +17,7 @@ const EditModal = ({ transaction, onClose, onSave }) => {
     const [notes, setNotes] = useState(transaction.description || '');
     const [buyer, setBuyer] = useState(transaction.buyer_name || '');
     const [receipt, setReceipt] = useState(transaction.receipt_number || '');
+    const [paymentStatus, setPaymentStatus] = useState(transaction.payment_status || 'paid');
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState('');
 
@@ -26,8 +27,8 @@ const EditModal = ({ transaction, onClose, onSave }) => {
         setError('');
         try {
             const payload = isSale
-                ? { amount: parseFloat(amount), sale_date: date, description: notes, buyer_name: buyer }
-                : { amount: parseFloat(amount), expense_date: date, description: notes, receipt_number: receipt };
+                ? { amount: parseFloat(amount), sale_date: date, description: notes, buyer_name: buyer, payment_status: paymentStatus }
+                : { amount: parseFloat(amount), expense_date: date, description: notes, receipt_number: receipt, payment_status: paymentStatus };
             await onSave(transaction.id, payload);
             onClose();
         } catch (err) {
@@ -92,14 +93,44 @@ const EditModal = ({ transaction, onClose, onSave }) => {
                         <input type="date" value={date} onChange={e => setDate(e.target.value)} required />
                     </div>
 
-                    {isSale && (
+                    <div>
+                        <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, marginBottom: '0.35rem' }}>Payment Status</label>
+                        <div style={{ display: 'flex', gap: '0.5rem' }}>
+                            <button
+                                type="button"
+                                onClick={() => setPaymentStatus('paid')}
+                                style={{
+                                    flex: 1, padding: '0.45rem', borderRadius: '8px', cursor: 'pointer',
+                                    border: `1.5px solid ${paymentStatus === 'paid' ? '#15803d' : 'var(--border-color)'}`,
+                                    backgroundColor: paymentStatus === 'paid' ? '#dcfce7' : 'white',
+                                    color: paymentStatus === 'paid' ? '#15803d' : 'var(--text-body)',
+                                    fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.15s'
+                                }}
+                            >
+                                Paid
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => setPaymentStatus('yet_to_pay')}
+                                style={{
+                                    flex: 1, padding: '0.45rem', borderRadius: '8px', cursor: 'pointer',
+                                    border: `1.5px solid ${paymentStatus === 'yet_to_pay' ? '#ea580c' : 'var(--border-color)'}`,
+                                    backgroundColor: paymentStatus === 'yet_to_pay' ? '#ffedd5' : 'white',
+                                    color: paymentStatus === 'yet_to_pay' ? '#c2410c' : 'var(--text-body)',
+                                    fontWeight: 600, fontSize: '0.85rem', transition: 'all 0.15s'
+                                }}
+                            >
+                                Yet to Pay
+                            </button>
+                        </div>
+                    </div>
+
+                    {isSale ? (
                         <div>
                             <label>Buyer Name (Optional)</label>
                             <input type="text" value={buyer} onChange={e => setBuyer(e.target.value)} placeholder="e.g. Local Market" />
                         </div>
-                    )}
-
-                    {!isSale && (
+                    ) : (
                         <div>
                             <label>Receipt No (Optional)</label>
                             <input type="text" value={receipt} onChange={e => setReceipt(e.target.value)} placeholder="e.g. REC-1204" />
@@ -126,8 +157,9 @@ const EditModal = ({ transaction, onClose, onSave }) => {
 };
 
 /* ── Transaction Card ──────────────────────── */
-const TransactionCard = ({ t, onEdit, onDelete }) => {
+const TransactionCard = ({ t, onEdit, onDelete, onToggleStatus }) => {
     const isSale = t.transaction_type === 'sale';
+    const isPaid = t.payment_status === 'paid';
     const [confirmDelete, setConfirmDelete] = useState(false);
 
     return (
@@ -136,7 +168,7 @@ const TransactionCard = ({ t, onEdit, onDelete }) => {
                 {/* Color accent bar */}
                 <div style={{
                     width: 4, flexShrink: 0,
-                    background: isSale ? 'var(--primary-color)' : 'var(--accent-orange)',
+                    background: isSale ? (isPaid ? 'var(--primary-color)' : '#ea580c') : (isPaid ? 'var(--accent-orange)' : '#dc2626'),
                 }} />
 
                 <div style={{ flex: 1, padding: '0.875rem 1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '0.5rem' }}>
@@ -144,15 +176,38 @@ const TransactionCard = ({ t, onEdit, onDelete }) => {
                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flex: 1, minWidth: 0 }}>
                         <div style={{
                             width: 36, height: 36, borderRadius: '10px', flexShrink: 0,
-                            background: isSale ? 'var(--primary-100)' : 'var(--accent-orange-light)',
+                            background: isSale ? (isPaid ? 'var(--primary-100)' : '#fff7ed') : (isPaid ? 'var(--accent-orange-light)' : '#fee2e2'),
                             display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            color: isSale ? 'var(--primary-dark)' : 'var(--accent-orange)',
+                            color: isSale ? (isPaid ? 'var(--primary-dark)' : '#c2410c') : (isPaid ? 'var(--accent-orange)' : '#dc2626'),
                         }}>
                             {isSale ? <TrendingUp size={18} /> : <TrendingDown size={18} />}
                         </div>
-                        <div style={{ minWidth: 0 }}>
-                            <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-dark)', marginBottom: '2px' }}>
-                                {t.section_name || 'Unknown Area'}
+                        <div style={{ minWidth: 0, flex: 1 }}>
+                            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '8px' }}>
+                                <div style={{ fontWeight: 600, fontSize: '0.9rem', color: 'var(--text-dark)' }}>
+                                    {t.section_name || 'Unknown Area'}
+                                </div>
+                                <button
+                                    type="button"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        if (onToggleStatus) onToggleStatus(t);
+                                    }}
+                                    title="Click to toggle Payment Status"
+                                    style={{
+                                        fontSize: '0.7rem',
+                                        fontWeight: 600,
+                                        padding: '2px 8px',
+                                        borderRadius: '12px',
+                                        border: `1px solid ${isPaid ? '#bbf7d0' : '#fed7aa'}`,
+                                        cursor: 'pointer',
+                                        background: isPaid ? '#dcfce7' : '#ffedd5',
+                                        color: isPaid ? '#15803d' : '#c2410c',
+                                        transition: 'all 0.15s',
+                                    }}
+                                >
+                                    {isPaid ? 'Paid' : 'Yet to Pay'} ✎
+                                </button>
                             </div>
                             <div style={{ fontSize: '0.8rem', color: 'var(--text-body)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                                 {t.description || t.category || (isSale ? 'Product Sale' : 'Farm Expense')}
@@ -167,7 +222,7 @@ const TransactionCard = ({ t, onEdit, onDelete }) => {
 
                     {/* Right: amount + actions */}
                     <div style={{ textAlign: 'right', flexShrink: 0, display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '6px' }}>
-                        <div style={{ fontWeight: 700, fontSize: '1rem', color: isSale ? 'var(--primary-color)' : 'var(--accent-red)' }}>
+                        <div style={{ fontWeight: 700, fontSize: '1rem', color: isSale ? (isPaid ? 'var(--primary-color)' : '#ea580c') : 'var(--accent-red)' }}>
                             {isSale ? '+' : '-'}₹{Number(t.amount).toLocaleString()}
                         </div>
                         <div style={{ display: 'flex', gap: '4px' }}>
@@ -226,7 +281,7 @@ const TransactionsHistory = () => {
     const [allTransactions, setAllTransactions] = useState([]);
     const [sections, setSections] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [typeFilter, setTypeFilter] = useState('all');       // 'all' | 'sale' | 'expense'
+    const [typeFilter, setTypeFilter] = useState('all');       // 'all' | 'paid' | 'yet_to_pay' | 'sale' | 'expense'
     const [sectionFilter, setSectionFilter] = useState('all'); // 'all' | section.id
     const [editTarget, setEditTarget] = useState(null);
     const navigate = useNavigate();
@@ -249,16 +304,31 @@ const TransactionsHistory = () => {
 
     useEffect(() => { fetchData(); }, [fetchData]);
 
+    /* Metrics for Paid and Yet to Pay */
+    const paidRecords = allTransactions.filter(t => t.payment_status === 'paid');
+    const yetToPayRecords = allTransactions.filter(t => t.payment_status === 'yet_to_pay' || (!t.payment_status && t.transaction_type === 'sale'));
+
+    const paidCount = paidRecords.length;
+    const paidTotal = paidRecords.reduce((s, t) => s + Number(t.amount || 0), 0);
+
+    const yetToPayCount = yetToPayRecords.length;
+    const yetToPayTotal = yetToPayRecords.reduce((s, t) => s + Number(t.amount || 0), 0);
+
     /* Apply filters */
     const filtered = allTransactions.filter(t => {
-        const typeOk = typeFilter === 'all' || t.transaction_type === typeFilter;
-        const secOk  = sectionFilter === 'all' || String(t.section_id) === String(sectionFilter);
+        let typeOk = true;
+        if (typeFilter === 'sale') typeOk = t.transaction_type === 'sale';
+        else if (typeFilter === 'expense') typeOk = t.transaction_type === 'expense';
+        else if (typeFilter === 'paid') typeOk = t.payment_status === 'paid';
+        else if (typeFilter === 'yet_to_pay') typeOk = t.payment_status === 'yet_to_pay' || (!t.payment_status && t.transaction_type === 'sale');
+
+        const secOk = sectionFilter === 'all' || String(t.section_id) === String(sectionFilter);
         return typeOk && secOk;
     });
 
     /* Summary for active filter */
-    const totalEarned = filtered.filter(t => t.transaction_type === 'sale').reduce((s, t) => s + Number(t.amount), 0);
-    const totalSpent  = filtered.filter(t => t.transaction_type === 'expense').reduce((s, t) => s + Number(t.amount), 0);
+    const totalEarned = filtered.filter(t => t.transaction_type === 'sale').reduce((s, t) => s + Number(t.amount || 0), 0);
+    const totalSpent  = filtered.filter(t => t.transaction_type === 'expense').reduce((s, t) => s + Number(t.amount || 0), 0);
 
     /* Edit handler */
     const handleSave = async (id, payload) => {
@@ -273,6 +343,30 @@ const TransactionsHistory = () => {
         if (t.transaction_type === 'sale') await salesAPI.deleteSale(t.id);
         else await expensesAPI.deleteExpense(t.id);
         setAllTransactions(prev => prev.filter(x => !(x.id === t.id && x.transaction_type === t.transaction_type)));
+    };
+
+    /* Toggle Payment Status handler */
+    const handleToggleStatus = async (t) => {
+        const newStatus = t.payment_status === 'paid' ? 'yet_to_pay' : 'paid';
+        if (t.transaction_type === 'sale') {
+            const payload = {
+                amount: parseFloat(t.amount),
+                sale_date: t.transaction_date,
+                description: t.description || '',
+                buyer_name: t.buyer_name || '',
+                payment_status: newStatus
+            };
+            await salesAPI.updateSale(t.id, payload);
+        } else {
+            const payload = {
+                amount: parseFloat(t.amount),
+                expense_date: t.transaction_date,
+                description: t.description || '',
+                payment_status: newStatus
+            };
+            await expensesAPI.updateExpense(t.id, payload);
+        }
+        await fetchData();
     };
 
     return (
@@ -299,7 +393,39 @@ const TransactionsHistory = () => {
                 </div>
             </div>
 
-            {/* Summary mini cards */}
+            {/* Payment Status Metric cards */}
+            {!loading && (
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                    <div 
+                        onClick={() => setTypeFilter('paid')}
+                        style={{ 
+                            background: '#f0fdf4', borderRadius: '12px', padding: '0.875rem', 
+                            borderLeft: '4px solid #16a34a', cursor: 'pointer',
+                        }}
+                    >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '0.72rem', color: '#15803d', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Paid Sales</span>
+                            <span style={{ fontSize: '0.7rem', fontWeight: 700, background: '#dcfce7', color: '#15803d', padding: '1px 7px', borderRadius: '10px' }}>{paidCount}</span>
+                        </div>
+                        <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#16a34a' }}>₹{paidTotal.toLocaleString()}</div>
+                    </div>
+                    <div 
+                        onClick={() => setTypeFilter('yet_to_pay')}
+                        style={{ 
+                            background: '#fff7ed', borderRadius: '12px', padding: '0.875rem', 
+                            borderLeft: '4px solid #ea580c', cursor: 'pointer',
+                        }}
+                    >
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                            <span style={{ fontSize: '0.72rem', color: '#c2410c', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.04em' }}>Yet to Pay</span>
+                            <span style={{ fontSize: '0.7rem', fontWeight: 700, background: '#ffedd5', color: '#c2410c', padding: '1px 7px', borderRadius: '10px' }}>{yetToPayCount}</span>
+                        </div>
+                        <div style={{ fontWeight: 700, fontSize: '1.1rem', color: '#ea580c' }}>₹{yetToPayTotal.toLocaleString()}</div>
+                    </div>
+                </div>
+            )}
+
+            {/* Financial Overview cards */}
             {!loading && (
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                     <div style={{ background: 'var(--primary-50)', borderRadius: '12px', padding: '0.875rem', borderLeft: '3px solid var(--primary-color)' }}>
@@ -340,10 +466,12 @@ const TransactionsHistory = () => {
                 </div>
             </div>
 
-            {/* Type filter */}
-            <div style={{ display: 'flex', gap: '0.5rem' }}>
+            {/* Type & Payment Status filter */}
+            <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto', paddingBottom: '4px' }}>
                 {[
                     { key: 'all', label: 'All Records' },
+                    { key: 'paid', label: `Paid (${paidCount})` },
+                    { key: 'yet_to_pay', label: `Yet to Pay (${yetToPayCount})` },
                     { key: 'sale', label: 'Sales Only' },
                     { key: 'expense', label: 'Expenses Only' },
                 ].map(f => (
@@ -357,7 +485,7 @@ const TransactionsHistory = () => {
                             backgroundColor: typeFilter === f.key ? 'var(--primary-color)' : 'white',
                             color: typeFilter === f.key ? 'white' : 'var(--text-body)',
                             fontSize: '0.8rem', fontWeight: 500,
-                            cursor: 'pointer', transition: 'all 0.15s',
+                            cursor: 'pointer', transition: 'all 0.15s', whiteSpace: 'nowrap'
                         }}
                     >
                         {f.label}
@@ -391,6 +519,7 @@ const TransactionsHistory = () => {
                             t={t}
                             onEdit={setEditTarget}
                             onDelete={handleDelete}
+                            onToggleStatus={handleToggleStatus}
                         />
                     ))}
                 </div>

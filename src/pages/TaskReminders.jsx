@@ -51,6 +51,8 @@ const TaskModal = ({ visible, onClose, onSaved, sections, editTask, defaultDate 
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
 
+
+
   useEffect(() => {
     if (editTask) {
       setSectionId(String(editTask.section_id || ''));
@@ -62,15 +64,27 @@ const TaskModal = ({ visible, onClose, onSaved, sections, editTask, defaultDate 
       setStage(editTask.stage || '');
       setCost(String(editTask.estimated_cost || ''));
     } else {
-      setSectionId(sections[0]?.id ? String(sections[0].id) : '');
+      const initialSec = sections[0];
+      setSectionId(initialSec?.id ? String(initialSec.id) : '');
       setTitle(''); setDescription('');
       setDueDate(defaultDate || new Date().toISOString().split('T')[0]);
-      setReminderDays('3'); setCropType(''); setStage(''); setCost('');
+      setReminderDays('3'); 
+      setCropType(initialSec?.crop_type || initialSec?.category || initialSec?.name || ''); 
+      setStage(''); 
+      setCost('');
     }
     setError(null);
   }, [editTask, visible, sections, defaultDate]);
 
   if (!visible) return null;
+
+  const handleSectionChange = (newSecId) => {
+    setSectionId(newSecId);
+    const selectedSec = sections.find(s => String(s.id) === String(newSecId));
+    if (selectedSec) {
+      setCropType(selectedSec.crop_type || selectedSec.category || selectedSec.name || '');
+    }
+  };
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -134,7 +148,7 @@ const TaskModal = ({ visible, onClose, onSaved, sections, editTask, defaultDate 
         <form onSubmit={handleSave} style={{ display: 'flex', flexDirection: 'column', gap: '1.1rem' }}>
           <div>
             <label style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Farm Section *</label>
-            <select value={sectionId} onChange={e => setSectionId(e.target.value)} required style={{ width: '100%', marginTop: '4px' }}>
+            <select value={sectionId} onChange={e => handleSectionChange(e.target.value)} required style={{ width: '100%', marginTop: '4px' }}>
               <option value="" disabled>Select Farm Section</option>
               {sections.map(s => <option key={s.id} value={s.id}>{s.name}</option>)}
             </select>
@@ -142,7 +156,7 @@ const TaskModal = ({ visible, onClose, onSaved, sections, editTask, defaultDate 
 
           <div>
             <label style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Task Title *</label>
-            <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Cattle Vaccination / Milk Processing / Fertilizer Spray" required style={{ width: '100%', marginTop: '4px' }} />
+            <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Vaccination / Feeding / Milk Processing / Fertilizer Spray" required style={{ width: '100%', marginTop: '4px' }} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -156,52 +170,38 @@ const TaskModal = ({ visible, onClose, onSaved, sections, editTask, defaultDate 
             </div>
           </div>
 
-          <div>
-            <label style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Farm Category / Type (Optional)</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px', marginBottom: '8px' }}>
-              {FARM_CATEGORIES.map(c => (
-                <button type="button" key={c} onClick={() => setCropType(cropType === c ? '' : c)}
-                  style={{
-                    padding: '5px 12px', borderRadius: '16px', fontSize: '0.8rem', cursor: 'pointer',
-                    border: cropType === c ? '1.5px solid var(--primary-color)' : '1px solid var(--border-color)',
-                    background: cropType === c ? 'var(--primary-color)' : '#fff',
-                    color: cropType === c ? '#fff' : 'var(--text-dark)', fontWeight: cropType === c ? 600 : 500
-                  }}>
-                  {c}
-                </button>
-              ))}
-            </div>
-            <input 
-              type="text" 
-              value={cropType} 
-              onChange={e => setCropType(e.target.value)} 
-              placeholder="Or type custom category (e.g. Dairy, Goat Farm, Wheat)" 
-              style={{ width: '100%', fontSize: '0.85rem' }} 
-            />
-          </div>
+
 
           <div>
             <label style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Operation / Stage (Optional)</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px', marginBottom: '8px' }}>
+            <select 
+              value={OPERATION_STAGES.includes(stage) ? stage : (stage ? 'Other' : '')} 
+              onChange={e => {
+                const val = e.target.value;
+                if (val === 'Other') {
+                  setStage('');
+                } else {
+                  setStage(val);
+                }
+              }} 
+              style={{ width: '100%', marginTop: '4px' }}
+            >
+              <option value="">Select Stage / Operation</option>
               {OPERATION_STAGES.map(s => (
-                <button type="button" key={s} onClick={() => setStage(stage === s ? '' : s)}
-                  style={{
-                    padding: '4px 10px', borderRadius: '16px', fontSize: '0.78rem', cursor: 'pointer',
-                    border: stage === s ? '1.5px solid var(--primary-color)' : '1px solid var(--border-color)',
-                    background: stage === s ? 'var(--primary-50)' : '#fff',
-                    color: stage === s ? 'var(--primary-dark)' : 'var(--text-dark)', fontWeight: stage === s ? 700 : 500
-                  }}>
-                  {s}
-                </button>
+                <option key={s} value={s}>{s}</option>
               ))}
-            </div>
-            <input 
-              type="text" 
-              value={stage} 
-              onChange={e => setStage(e.target.value)} 
-              placeholder="Or type custom stage (e.g. Morning Milking, Deworming)" 
-              style={{ width: '100%', fontSize: '0.85rem' }} 
-            />
+              <option value="Other">Other (Type Custom Stage...)</option>
+            </select>
+
+            {(!OPERATION_STAGES.includes(stage) || stage === '') && (
+              <input 
+                type="text" 
+                value={stage} 
+                onChange={e => setStage(e.target.value)} 
+                placeholder="Type custom stage (e.g. Morning Milking, Deworming)" 
+                style={{ width: '100%', marginTop: '8px', fontSize: '0.85rem' }} 
+              />
+            )}
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>

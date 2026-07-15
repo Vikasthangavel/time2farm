@@ -105,6 +105,7 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
     const [amount, setAmount] = useState('');
     const [quantity, setQuantity] = useState('');
     const [unit, setUnit] = useState('kg');
+    const [paymentStatus, setPaymentStatus] = useState('paid'); // 'paid' | 'yet_to_pay'
     const [buyer, setBuyer] = useState('');
     const [receipt, setReceipt] = useState('');
     const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
@@ -152,6 +153,10 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
             setError(`Please select a ${isSale ? 'category / product' : 'category'} first.`);
             return;
         }
+        if (!paymentStatus) {
+            setError('Payment Status is mandatory. Please select Paid or Yet to Pay.');
+            return;
+        }
         setIsSubmitting(true);
         setError('');
 
@@ -165,7 +170,8 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                     description: notes || '',
                     sale_date: date,
                     buyer_name: buyer,
-                    unit: unit
+                    unit: unit,
+                    payment_status: paymentStatus
                 };
                 const res = await salesAPI.addSale(sectionId, payload);
                 if (res.success) navigate('/transactions');
@@ -176,7 +182,8 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                     amount: parseFloat(amount),
                     receipt_number: receipt,
                     expense_date: date,
-                    description: notes || ''
+                    description: notes || '',
+                    payment_status: paymentStatus
                 };
                 const res = await expensesAPI.addExpense(sectionId, payload);
                 if (res.success) navigate('/transactions');
@@ -396,11 +403,22 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                 </div>
             )}
 
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '0.5rem' }}>
+            <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                gap: '0.5rem', 
+                padding: '0.75rem 0.5rem',
+                position: 'sticky',
+                top: 0,
+                zIndex: 100,
+                backgroundColor: 'var(--bg-main, #f8fafc)',
+                borderBottom: '1px solid var(--border-color, #e2e8f0)',
+                marginBottom: '1rem'
+            }}>
                 <button onClick={() => navigate(-1)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-dark)' }}>
                     <ArrowLeft size={24} />
                 </button>
-                <h2 style={{ fontSize: '1.25rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <h2 style={{ fontSize: '1.25rem', fontWeight: '600', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
                     {isSale ? <TrendingUp color="var(--primary-color)" /> : <TrendingDown color="var(--accent-red)" />}
                     {isSale ? 'Record Sale' : 'Add Expense'}
                 </h2>
@@ -528,6 +546,45 @@ const TransactionForm = ({ defaultType = 'expense' }) => {
                                 </div>
                             </>
                         )}
+
+                        {/* Payment Status (Sales & Expenses) */}
+                        <div>
+                            <label style={{ display: 'block', fontSize: '0.875rem', marginBottom: '0.35rem', fontWeight: '500' }}>Payment Status</label>
+                            <div style={{ display: 'flex', gap: '0.75rem' }}>
+                                <button
+                                    type="button"
+                                    onClick={() => setPaymentStatus('paid')}
+                                    style={{
+                                        flex: 1,
+                                        padding: '0.65rem',
+                                        borderRadius: '10px',
+                                        border: `1.5px solid ${paymentStatus === 'paid' ? '#16a34a' : 'var(--border-color)'}`,
+                                        background: paymentStatus === 'paid' ? '#f0fdf4' : 'transparent',
+                                        color: paymentStatus === 'paid' ? '#15803d' : 'var(--text-dark)',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    Paid
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setPaymentStatus('yet_to_pay')}
+                                    style={{
+                                        flex: 1,
+                                        padding: '0.65rem',
+                                        borderRadius: '10px',
+                                        border: `1.5px solid ${paymentStatus === 'yet_to_pay' ? '#ea580c' : 'var(--border-color)'}`,
+                                        background: paymentStatus === 'yet_to_pay' ? '#fff7ed' : 'transparent',
+                                        color: paymentStatus === 'yet_to_pay' ? '#c2410c' : 'var(--text-dark)',
+                                        fontWeight: '600',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    Yet to Pay
+                                </button>
+                            </div>
+                        </div>
 
                         {/* Expense specific fields */}
                         {!isSale && (
