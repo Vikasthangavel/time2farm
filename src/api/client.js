@@ -192,6 +192,43 @@ export const sectionsAPI = {
     }
 };
 
+export const mandiAPI = {
+    /**
+     * Fetch mandi commodity prices via Flask backend proxy.
+     * Mirrors the React Native mandiAPI.js exactly.
+     */
+    fetchPrices: async ({ state, district, market, commodity, variety, grade } = {}, offset = 0, limit = 20) => {
+        const response = await apiClient.get('/mandi/prices', {
+            params: { state, district, market, commodity, variety, grade, offset, limit }
+        });
+        return {
+            records: response.data.records || [],
+            total: response.data.total || 0,
+            offset: response.data.offset || 0,
+            limit: response.data.count || limit,
+        };
+    }
+};
+
+export const POPULAR_COMMODITIES = [
+    'Tomato', 'Onion', 'Potato', 'Rice', 'Wheat', 'Maize',
+    'Cotton', 'Groundnut', 'Soyabean', 'Turmeric', 'Chilli',
+    'Garlic', 'Ginger', 'Banana', 'Mango', 'Sugarcane',
+    'Coconut', 'Brinjal', 'Cabbage', 'Cauliflower',
+];
+
+export const INDIAN_STATES = [
+    'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar',
+    'Chhattisgarh', 'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh',
+    'Jharkhand', 'Karnataka', 'Kerala', 'Madhya Pradesh', 'Maharashtra',
+    'Manipur', 'Meghalaya', 'Mizoram', 'Nagaland', 'Odisha', 'Punjab',
+    'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana', 'Tripura',
+    'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
+    'Andaman and Nicobar', 'Chandigarh', 'Dadra and Nagar Haveli',
+    'Daman and Diu', 'Delhi', 'Jammu and Kashmir', 'Ladakh',
+    'Lakshadweep', 'Puducherry',
+];
+
 export const reportsAPI = {
     generateReport: async () => {
         const response = await apiClient.get('/reports/generate', {

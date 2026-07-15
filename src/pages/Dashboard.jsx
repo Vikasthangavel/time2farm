@@ -4,7 +4,7 @@ import { dashboardAPI } from '../api/client';
 import {
     TrendingUp, TrendingDown, DollarSign, Layers,
     Camera, Map, Bot, History, FileText, Settings, HelpCircle,
-    Lightbulb, Zap, ArrowRight
+    Lightbulb, Zap, ArrowRight, Store
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -154,7 +154,7 @@ const Dashboard = () => {
                     <ActionGridItem icon={History}     label="View Records"  path="/transactions" color="var(--text-body)" />
                     <ActionGridItem icon={FileText}    label="Reports"       path="/reports"      color="var(--primary-color)" />
                     <ActionGridItem icon={Settings}    label="Settings"      path="/profile"      color="var(--text-muted)" />
-                    <ActionGridItem icon={HelpCircle}  label="Get Help"      path="/help"         color="var(--accent-orange)" />
+                    <ActionGridItem icon={Store}       label="Mandi Rates"   path="/mandi-prices" color="var(--primary-dark)" />
                 </div>
             </div>
 

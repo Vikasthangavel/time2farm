@@ -1,11 +1,12 @@
 import React from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
-import { Home, PlusCircle, LineChart, User, LogOut, History } from 'lucide-react';
+import { Home, PlusCircle, LineChart, User, LogOut, History, Store } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import ChatWidget from './ChatWidget';
 
 const navItems = [
     { icon: Home,       label: 'Home',         path: '/' },
+    { icon: Store,      label: 'Mandi Rates',  path: '/mandi-prices' },
     { icon: PlusCircle, label: 'Add',          path: '/add-action' },
     { icon: History,    label: 'Transactions', path: '/transactions' },
     { icon: LineChart,  label: 'Reports',      path: '/reports' },
@@ -14,6 +15,7 @@ const navItems = [
 
 const mobileNavItems = [
     { icon: Home,       label: 'Home',         path: '/' },
+    { icon: Store,      label: 'Mandi',        path: '/mandi-prices' },
     { icon: PlusCircle, label: 'Add',          path: '/add-action' },
     { icon: History,    label: 'Records',      path: '/transactions' },
     { icon: LineChart,  label: 'Reports',      path: '/reports' },
@@ -159,6 +161,7 @@ const Sidebar = () => {
    ─────────────────────────────────────────── */
 const PAGE_TITLES = {
     '/':                 'Dashboard',
+    '/mandi-prices':     'Mandi Prices',
     '/add-action':       'Add Action',
     '/record-sale':      'Record Sale',
     '/add-expense':      'Add Expense',

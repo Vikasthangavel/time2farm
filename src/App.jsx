@@ -15,6 +15,7 @@ import Profile from './pages/Profile';
 import AIAssistant from './pages/AIAssistant';
 import Reports from './pages/Reports';
 import ReportDownload from './pages/ReportDownload';
+import MandiPrices from './pages/MandiPrices';
 import DeleteAccountPublic from './pages/DeleteAccountPublic';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
@@ -60,6 +61,7 @@ function AppRoutes() {
         <Route path="/ai-assistant" element={<AIAssistant />} />
         <Route path="/reports" element={<Reports />} />
         <Route path="/reports/download" element={<ReportDownload />} />
+        <Route path="/mandi-prices" element={<MandiPrices />} />
 
         <Route path="*" element={<Navigate to="/" replace />} />
       </Route>
