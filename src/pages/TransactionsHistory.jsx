@@ -304,37 +304,38 @@ const TransactionsHistory = () => {
 
     useEffect(() => { fetchData(); }, [fetchData]);
 
-    /* Financial Overview Calculations */
-    const salesRecords = allTransactions.filter(t => t.transaction_type === 'sale');
-    const expenseRecords = allTransactions.filter(t => t.transaction_type === 'expense');
+    /* Filter transactions by selected area/section first */
+    const areaFilteredTransactions = allTransactions.filter(t => 
+        sectionFilter === 'all' || String(t.section_id) === String(sectionFilter)
+    );
 
-    // Total income and expenses across all transactions
+    const salesRecords = areaFilteredTransactions.filter(t => t.transaction_type === 'sale');
+    const expenseRecords = areaFilteredTransactions.filter(t => t.transaction_type === 'expense');
+
+    // Total income and expenses for selected area
     const totalIncome = salesRecords.reduce((s, t) => s + Number(t.amount || 0), 0);
     const totalExpenses = expenseRecords.reduce((s, t) => s + Number(t.amount || 0), 0);
     const netProfit = totalIncome - totalExpenses;
 
-    // 1. To Collect (Needed to pay by others) -> Unpaid sales
+    // 1. To Collect (Needed to pay by others) for selected area
     const toCollectRecords = salesRecords.filter(t => t.payment_status === 'yet_to_pay');
     const toCollectCount = toCollectRecords.length;
     const toCollectTotal = toCollectRecords.reduce((s, t) => s + Number(t.amount || 0), 0);
 
-    // 2. To Pay (Needed to pay me to others) -> Unpaid expenses
+    // 2. To Pay (Needed to pay me to others) for selected area
     const toPayRecords = expenseRecords.filter(t => t.payment_status === 'yet_to_pay');
     const toPayCount = toPayRecords.length;
     const toPayTotal = toPayRecords.reduce((s, t) => s + Number(t.amount || 0), 0);
 
-    /* Apply filters */
-    const filtered = allTransactions.filter(t => {
-        let typeOk = true;
-        if (typeFilter === 'sale') typeOk = t.transaction_type === 'sale';
-        else if (typeFilter === 'expense') typeOk = t.transaction_type === 'expense';
-        else if (typeFilter === 'to_collect') typeOk = t.transaction_type === 'sale' && t.payment_status === 'yet_to_pay';
-        else if (typeFilter === 'to_pay') typeOk = t.transaction_type === 'expense' && t.payment_status === 'yet_to_pay';
-        else if (typeFilter === 'paid') typeOk = t.payment_status === 'paid';
-        else if (typeFilter === 'yet_to_pay') typeOk = t.payment_status === 'yet_to_pay';
-
-        const secOk = sectionFilter === 'all' || String(t.section_id) === String(sectionFilter);
-        return typeOk && secOk;
+    /* Apply type filter on top of area filter */
+    const filtered = areaFilteredTransactions.filter(t => {
+        if (typeFilter === 'sale') return t.transaction_type === 'sale';
+        if (typeFilter === 'expense') return t.transaction_type === 'expense';
+        if (typeFilter === 'to_collect') return t.transaction_type === 'sale' && t.payment_status === 'yet_to_pay';
+        if (typeFilter === 'to_pay') return t.transaction_type === 'expense' && t.payment_status === 'yet_to_pay';
+        if (typeFilter === 'paid') return t.payment_status === 'paid';
+        if (typeFilter === 'yet_to_pay') return t.payment_status === 'yet_to_pay';
+        return true;
     });
 
     /* Edit handler */
