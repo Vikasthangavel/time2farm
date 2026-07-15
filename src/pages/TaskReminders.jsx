@@ -14,8 +14,12 @@ const STATUS_OPTIONS = [
   { value: 'cancelled',   label: 'Cancelled',   color: 'var(--text-muted)', bg: 'var(--bg-main)' },
 ];
 
-const CROP_TYPES = ['paddy', 'wheat', 'sugarcane', 'cotton', 'vegetables', 'fruits', 'other'];
-const STAGES = ['Preparation', 'Sowing', 'Transplanting', 'Irrigation', 'Nutrition', 'Protection', 'Maintenance', 'Harvest'];
+const FARM_CATEGORIES = ['Dairy / Cattle', 'Poultry', 'Crops', 'Equipment', 'General Farm'];
+const OPERATION_STAGES = [
+  'Vaccination', 'Feeding', 'Milking', 'Breeding', 'Deworming',
+  'Preparation', 'Sowing', 'Irrigation', 'Nutrition', 'Protection',
+  'Maintenance', 'Harvest'
+];
 const FILTER_OPTIONS = ['all', 'pending', 'in_progress', 'done'];
 
 function daysUntil(dateStr) {
@@ -83,8 +87,8 @@ const TaskModal = ({ visible, onClose, onSaved, sections, editTask, defaultDate 
         description: description.trim(),
         due_date: dueDate,
         reminder_days_before: parseInt(reminderDays) || 3,
-        crop_type: cropType,
-        stage,
+        crop_type: cropType.trim(),
+        stage: stage.trim(),
         estimated_cost: parseFloat(cost) || 0,
       };
       if (editTask) {
@@ -138,7 +142,7 @@ const TaskModal = ({ visible, onClose, onSaved, sections, editTask, defaultDate 
 
           <div>
             <label style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Task Title *</label>
-            <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Apply Fertilizer Spray" required style={{ width: '100%', marginTop: '4px' }} />
+            <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="e.g. Cattle Vaccination / Milk Processing / Fertilizer Spray" required style={{ width: '100%', marginTop: '4px' }} />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
@@ -153,29 +157,36 @@ const TaskModal = ({ visible, onClose, onSaved, sections, editTask, defaultDate 
           </div>
 
           <div>
-            <label style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Crop Type</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
-              {CROP_TYPES.map(c => (
+            <label style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Farm Category / Type (Optional)</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px', marginBottom: '8px' }}>
+              {FARM_CATEGORIES.map(c => (
                 <button type="button" key={c} onClick={() => setCropType(cropType === c ? '' : c)}
                   style={{
-                    padding: '4px 12px', borderRadius: '16px', fontSize: '0.8rem', cursor: 'pointer',
+                    padding: '5px 12px', borderRadius: '16px', fontSize: '0.8rem', cursor: 'pointer',
                     border: cropType === c ? '1.5px solid var(--primary-color)' : '1px solid var(--border-color)',
                     background: cropType === c ? 'var(--primary-color)' : '#fff',
                     color: cropType === c ? '#fff' : 'var(--text-dark)', fontWeight: cropType === c ? 600 : 500
                   }}>
-                  {c.charAt(0).toUpperCase() + c.slice(1)}
+                  {c}
                 </button>
               ))}
             </div>
+            <input 
+              type="text" 
+              value={cropType} 
+              onChange={e => setCropType(e.target.value)} 
+              placeholder="Or type custom category (e.g. Dairy, Goat Farm, Wheat)" 
+              style={{ width: '100%', fontSize: '0.85rem' }} 
+            />
           </div>
 
           <div>
-            <label style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Growth Stage</label>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px' }}>
-              {STAGES.map(s => (
+            <label style={{ fontSize: '0.8rem', fontWeight: 700, textTransform: 'uppercase', color: 'var(--text-muted)', letterSpacing: '0.5px' }}>Operation / Stage (Optional)</label>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginTop: '6px', marginBottom: '8px' }}>
+              {OPERATION_STAGES.map(s => (
                 <button type="button" key={s} onClick={() => setStage(stage === s ? '' : s)}
                   style={{
-                    padding: '4px 12px', borderRadius: '16px', fontSize: '0.8rem', cursor: 'pointer',
+                    padding: '4px 10px', borderRadius: '16px', fontSize: '0.78rem', cursor: 'pointer',
                     border: stage === s ? '1.5px solid var(--primary-color)' : '1px solid var(--border-color)',
                     background: stage === s ? 'var(--primary-50)' : '#fff',
                     color: stage === s ? 'var(--primary-dark)' : 'var(--text-dark)', fontWeight: stage === s ? 700 : 500
@@ -184,6 +195,13 @@ const TaskModal = ({ visible, onClose, onSaved, sections, editTask, defaultDate 
                 </button>
               ))}
             </div>
+            <input 
+              type="text" 
+              value={stage} 
+              onChange={e => setStage(e.target.value)} 
+              placeholder="Or type custom stage (e.g. Morning Milking, Deworming)" 
+              style={{ width: '100%', fontSize: '0.85rem' }} 
+            />
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
