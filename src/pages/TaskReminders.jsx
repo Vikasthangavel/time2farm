@@ -2,16 +2,16 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { 
   Bell, Plus, X, CheckCircle2, Circle, Clock, AlertCircle, 
   Trash2, CalendarDays, DollarSign, Sprout, Filter, RefreshCw, 
-  Edit3, Calendar as CalendarIcon
+  Edit3, Calendar as CalendarIcon, Check, RotateCcw, Play
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { tasksAPI, sectionsAPI } from '../api/client';
 
 const STATUS_OPTIONS = [
-  { value: 'pending',     label: 'Pending',     color: 'var(--accent-orange)' },
-  { value: 'in_progress', label: 'In Progress', color: '#0284c7' },
-  { value: 'done',        label: 'Done',        color: 'var(--primary-color)' },
-  { value: 'cancelled',   label: 'Cancelled',   color: 'var(--text-muted)' },
+  { value: 'pending',     label: 'Pending',     color: 'var(--accent-orange)', bg: 'var(--accent-orange-light)' },
+  { value: 'in_progress', label: 'In Progress', color: '#0284c7', bg: '#e0f2fe' },
+  { value: 'done',        label: 'Completed',   color: 'var(--primary-color)', bg: 'var(--primary-50)' },
+  { value: 'cancelled',   label: 'Cancelled',   color: 'var(--text-muted)', bg: 'var(--bg-main)' },
 ];
 
 const CROP_TYPES = ['paddy', 'wheat', 'sugarcane', 'cotton', 'vegetables', 'fruits', 'other'];
@@ -116,7 +116,7 @@ const TaskModal = ({ visible, onClose, onSaved, sections, editTask, defaultDate 
           <h3 style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--text-dark)', margin: 0 }}>
             {editTask ? 'Edit Task Reminder' : 'Create New Task'}
           </h3>
-          <button onClick={onClose} style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}>
+          <button onClick={onClose} aria-label="Close" style={{ background: 'none', border: 'none', color: 'var(--text-muted)', cursor: 'pointer', padding: '4px' }}>
             <X size={20} />
           </button>
         </div>
@@ -244,18 +244,17 @@ export default function TaskReminders() {
     if (preselectedDate) setShowModal(true);
   }, [fetchData, preselectedDate]);
 
-  const toggleStatus = async (task) => {
-    const next = task.status === 'pending' ? 'in_progress'
-               : task.status === 'in_progress' ? 'done'
-               : 'pending';
+  const updateStatus = async (taskId, newStatus) => {
     try {
-      await tasksAPI.updateTask(task.id, { status: next });
-      setTasks(prev => prev.map(t => t.id === task.id ? { ...t, status: next } : t));
-    } catch (_) {}
+      await tasksAPI.updateTask(taskId, { status: newStatus });
+      setTasks(prev => prev.map(t => t.id === taskId ? { ...t, status: newStatus } : t));
+    } catch (e) {
+      alert('Could not update task status');
+    }
   };
 
   const handleDelete = async (task) => {
-    if (!window.confirm(`Delete task "${task.title}"?`)) return;
+    if (!window.confirm(`Are you sure you want to delete "${task.title}"?`)) return;
     try {
       await tasksAPI.deleteTask(task.id);
       setTasks(prev => prev.filter(t => t.id !== task.id));
@@ -270,33 +269,33 @@ export default function TaskReminders() {
   return (
     <div className="page-wrapper animate-fade-in" style={{ maxWidth: '1000px', margin: '0 auto' }}>
       
-      {/* Top Header */}
+      {/* Top Header Banner */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Bell size={24} color="var(--primary-color)" />
             <h1 style={{ fontSize: '1.5rem', fontWeight: 800, color: 'var(--text-dark)', margin: 0 }}>
-              Task Reminders & Scheduling
+              Farm Task Reminders
             </h1>
           </div>
           <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', margin: 0 }}>
-            Manage upcoming farm operations, irrigation schedules, and forecasted costs
+            Simple task list with 1-click status updates for daily farm operations
           </p>
         </div>
 
         <div style={{ display: 'flex', gap: '10px' }}>
           <button onClick={() => navigate('/calendar')} style={{ background: '#ffffff', border: '1px solid var(--border-color)', color: 'var(--text-dark)', display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
             <CalendarIcon size={16} color="var(--primary-color)" />
-            <span>Open Calendar View</span>
+            <span>Calendar View</span>
           </button>
           <button onClick={() => { setEditTask(null); setShowModal(true); }} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
             <Plus size={16} />
-            <span>New Task</span>
+            <span>Add New Task</span>
           </button>
         </div>
       </div>
 
-      {/* Forecast Metric Cards */}
+      {/* Overview Cards */}
       {filtered.length > 0 && (
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem', marginBottom: '1.25rem' }}>
           <div className="card" style={{ padding: '1rem 1.25rem', borderLeft: '4px solid var(--primary-color)', margin: 0, display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -329,7 +328,7 @@ export default function TaskReminders() {
           const active = filter === f;
           return (
             <button key={f} onClick={() => setFilter(f)} style={{
-              padding: '6px 14px', borderRadius: '20px', fontSize: '0.825rem',
+              padding: '6px 16px', borderRadius: '20px', fontSize: '0.825rem',
               border: active ? '1.5px solid var(--primary-color)' : '1px solid var(--border-color)',
               background: active ? 'var(--primary-color)' : '#ffffff',
               color: active ? '#ffffff' : 'var(--text-dark)', fontWeight: active ? 600 : 500,
@@ -341,113 +340,146 @@ export default function TaskReminders() {
         })}
       </div>
 
-      {/* Tasks List */}
+      {/* Simple & Easy Task List */}
       {loading ? (
         <div className="card flex-center" style={{ padding: '4rem', flexDirection: 'column', gap: '1rem' }}>
           <RefreshCw className="spin" size={32} style={{ color: 'var(--primary-color)' }} />
-          <div style={{ color: 'var(--text-muted)', fontWeight: 500 }}>Loading task reminders...</div>
+          <div style={{ color: 'var(--text-muted)', fontWeight: 500 }}>Loading farm tasks...</div>
         </div>
       ) : filtered.length === 0 ? (
         <div className="card flex-center" style={{ padding: '4rem 2rem', flexDirection: 'column', gap: '0.85rem', textAlign: 'center' }}>
           <Sprout size={48} style={{ color: 'var(--primary-light)' }} />
-          <div style={{ fontWeight: 700, fontSize: '1.15rem', color: 'var(--text-dark)' }}>No tasks found</div>
+          <div style={{ fontWeight: 700, fontSize: '1.15rem', color: 'var(--text-dark)' }}>No tasks in this list</div>
           <div style={{ color: 'var(--text-muted)', fontSize: '0.875rem', maxWidth: '400px' }}>
-            Schedule tasks manually or use crop templates in the calendar to automatically populate tasks.
+            Click "+ Add New Task" or apply a crop template from the calendar.
           </div>
           <button onClick={() => { setEditTask(null); setShowModal(true); }} style={{ marginTop: '0.5rem' }}>Create First Task</button>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.85rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {filtered.map(task => {
             const days = daysUntil(task.due_date);
             const isOverdue = days !== null && days < 0 && task.status !== 'done';
             const statusConfig = STATUS_OPTIONS.find(s => s.value === task.status) || STATUS_OPTIONS[0];
 
             return (
-              <div key={task.id} className="card hoverable" style={{
-                margin: 0, padding: '1.15rem', borderLeft: isOverdue ? '4px solid var(--accent-red)' : `4px solid ${statusConfig.color}`,
-                display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '1rem'
+              <div key={task.id} className="card" style={{
+                margin: 0, padding: '1.25rem',
+                borderLeft: isOverdue ? '5px solid var(--accent-red)' : `5px solid ${statusConfig.color}`,
+                background: task.status === 'done' ? '#f8fafc' : '#ffffff',
+                boxShadow: 'var(--shadow-sm)'
               }}>
-                <div style={{ flex: '1 1 300px' }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '6px' }}>
-                    <button onClick={() => toggleStatus(task)} style={{ background: 'none', border: 'none', padding: 0, cursor: 'pointer', display: 'flex', alignItems: 'center' }}>
-                      {task.status === 'done' ? (
-                        <CheckCircle2 size={22} color="var(--primary-color)" />
-                      ) : task.status === 'in_progress' ? (
-                        <Clock size={22} color="#0284c7" />
-                      ) : (
-                        <Circle size={22} color="var(--text-muted)" />
+                {/* Task Header & Status Badge */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                  <div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                      <h3 style={{
+                        fontSize: '1.1rem', fontWeight: 700, color: 'var(--text-dark)', margin: 0,
+                        textDecoration: task.status === 'done' ? 'line-through' : 'none',
+                        opacity: task.status === 'done' ? 0.75 : 1
+                      }}>
+                        {task.title}
+                      </h3>
+                      
+                      <span style={{
+                        fontSize: '0.75rem', fontWeight: 700, padding: '3px 10px', borderRadius: '12px',
+                        backgroundColor: statusConfig.bg, color: statusConfig.color, border: `1px solid ${statusConfig.color}40`
+                      }}>
+                        {statusConfig.label}
+                      </span>
+                    </div>
+
+                    {/* Metadata tags */}
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', flexWrap: 'wrap', fontSize: '0.825rem', marginTop: '6px' }}>
+                      <span style={{ 
+                        display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: isOverdue ? 700 : 600,
+                        color: isOverdue ? 'var(--accent-red)' : days <= 3 ? 'var(--accent-orange)' : 'var(--text-dark)',
+                        background: isOverdue ? 'rgba(217,64,64,0.1)' : 'var(--bg-main)', padding: '2px 8px', borderRadius: '6px'
+                      }}>
+                        <CalendarDays size={14} />
+                        {fmtDate(task.due_date)}
+                        {days !== null && (
+                          isOverdue ? ` (${Math.abs(days)}d Overdue)` : days === 0 ? ' (Due Today!)' : ` (${days}d remaining)`
+                        )}
+                      </span>
+
+                      {task.section_name && (
+                        <span style={{ background: 'var(--bg-main)', padding: '2px 8px', borderRadius: '6px', border: '1px solid var(--border-color)', fontWeight: 600, color: 'var(--text-dark)' }}>
+                          Section: {task.section_name}
+                        </span>
                       )}
-                    </button>
 
-                    <h3 style={{
-                      fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-dark)', margin: 0,
-                      textDecoration: task.status === 'done' ? 'line-through' : 'none',
-                      opacity: task.status === 'done' ? 0.65 : 1
-                    }}>
-                      {task.title}
-                    </h3>
+                      {task.crop_type && (
+                        <span style={{ background: 'var(--primary-50)', color: 'var(--primary-dark)', padding: '2px 8px', borderRadius: '6px', fontWeight: 600 }}>
+                          Crop: {task.crop_type}
+                        </span>
+                      )}
 
-                    <span style={{
-                      fontSize: '0.725rem', fontWeight: 700, padding: '3px 8px', borderRadius: '12px',
-                      backgroundColor: `${statusConfig.color}15`, color: statusConfig.color
-                    }}>
-                      {statusConfig.label}
-                    </span>
+                      {task.stage && (
+                        <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '6px', fontWeight: 600 }}>
+                          Stage: {task.stage}
+                        </span>
+                      )}
+                    </div>
                   </div>
 
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', fontSize: '0.825rem', color: 'var(--text-muted)' }}>
-                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', fontWeight: isOverdue ? 700 : 500, color: isOverdue ? 'var(--accent-red)' : days <= 3 ? 'var(--accent-orange)' : 'var(--text-muted)' }}>
-                      <CalendarDays size={14} />
-                      {fmtDate(task.due_date)}
-                      {days !== null && (
-                        isOverdue ? ` (${Math.abs(days)}d overdue)` : days === 0 ? ' (Today!)' : ` (${days}d left)`
-                      )}
-                    </span>
-
-                    {task.section_name && (
-                      <span style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'var(--bg-main)', padding: '2px 8px', borderRadius: '6px', border: '1px solid var(--border-color)', fontWeight: 500 }}>
-                        {task.section_name}
-                      </span>
-                    )}
-
-                    {task.crop_type && (
-                      <span style={{ background: 'var(--primary-50)', color: 'var(--primary-dark)', padding: '2px 8px', borderRadius: '6px', fontWeight: 600 }}>
-                        {task.crop_type}
-                      </span>
-                    )}
-
-                    {task.stage && (
-                      <span style={{ background: '#e0f2fe', color: '#0369a1', padding: '2px 8px', borderRadius: '6px', fontWeight: 600 }}>
-                        {task.stage}
-                      </span>
-                    )}
-                  </div>
-
-                  {task.description && (
-                    <div style={{ fontSize: '0.825rem', color: 'var(--text-muted)', marginTop: '6px', fontStyle: 'italic' }}>
-                      {task.description}
+                  {task.estimated_cost > 0 && (
+                    <div style={{ textAlign: 'right', background: 'var(--bg-main)', padding: '6px 12px', borderRadius: '8px', border: '1px solid var(--border-color)' }}>
+                      <div style={{ fontSize: '0.68rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 700 }}>Est. Cost</div>
+                      <div style={{ fontSize: '1.05rem', fontWeight: 800, color: 'var(--text-dark)' }}>₹{Number(task.estimated_cost).toLocaleString('en-IN')}</div>
                     </div>
                   )}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
-                  {task.estimated_cost > 0 && (
-                    <div style={{ textAlign: 'right' }}>
-                      <div style={{ fontSize: '0.7rem', color: 'var(--text-muted)', textTransform: 'uppercase', fontWeight: 600 }}>Est. Cost</div>
-                      <div style={{ fontSize: '1rem', fontWeight: 800, color: 'var(--text-dark)' }}>₹{Number(task.estimated_cost).toLocaleString('en-IN')}</div>
-                    </div>
-                  )}
+                {task.description && (
+                  <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)', background: 'var(--bg-main)', padding: '8px 12px', borderRadius: '8px', marginBottom: '1rem' }}>
+                    {task.description}
+                  </div>
+                )}
+
+                {/* Direct 1-Click Status Change Buttons Panel */}
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.75rem', borderTop: '1px solid var(--border-color)', paddingTop: '0.85rem' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, color: 'var(--text-muted)', textTransform: 'uppercase', marginRight: '4px' }}>Change Status:</span>
+
+                    {task.status !== 'done' && (
+                      <button 
+                        onClick={() => updateStatus(task.id, 'done')}
+                        style={{ background: 'var(--primary-color)', color: '#ffffff', border: 'none', padding: '6px 14px', borderRadius: '8px', fontSize: '0.825rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                      >
+                        <Check size={15} /> Mark Complete
+                      </button>
+                    )}
+
+                    {task.status !== 'in_progress' && task.status !== 'done' && (
+                      <button 
+                        onClick={() => updateStatus(task.id, 'in_progress')}
+                        style={{ background: '#e0f2fe', color: '#0284c7', border: '1px solid #bae6fd', padding: '6px 14px', borderRadius: '8px', fontSize: '0.825rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                      >
+                        <Play size={13} fill="#0284c7" /> Mark In Progress
+                      </button>
+                    )}
+
+                    {task.status === 'done' && (
+                      <button 
+                        onClick={() => updateStatus(task.id, 'pending')}
+                        style={{ background: 'var(--accent-orange-light)', color: 'var(--accent-orange)', border: '1px solid #fed7aa', padding: '6px 14px', borderRadius: '8px', fontSize: '0.825rem', fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '5px' }}
+                      >
+                        <RotateCcw size={14} /> Reopen Task
+                      </button>
+                    )}
+                  </div>
 
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                    <button onClick={() => { setEditTask(task); setShowModal(true); }} style={{ background: 'var(--primary-50)', color: 'var(--primary-dark)', border: 'none', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 600 }}>
+                    <button onClick={() => { setEditTask(task); setShowModal(true); }} style={{ background: 'var(--bg-main)', color: 'var(--text-dark)', border: '1px solid var(--border-color)', padding: '6px 12px', borderRadius: '8px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 600 }}>
                       <Edit3 size={14} /> Edit
                     </button>
-                    <button onClick={() => handleDelete(task)} style={{ background: 'rgba(217,64,64,0.1)', color: 'var(--accent-red)', border: 'none', padding: '6px 10px', borderRadius: '8px', cursor: 'pointer' }}>
-                      <Trash2 size={16} />
+                    <button onClick={() => handleDelete(task)} style={{ background: 'rgba(217,64,64,0.1)', color: 'var(--accent-red)', border: 'none', padding: '6px 10px', borderRadius: '8px', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: '4px', fontSize: '0.8rem', fontWeight: 600 }}>
+                      <Trash2 size={15} /> Delete
                     </button>
                   </div>
                 </div>
+
               </div>
             );
           })}
