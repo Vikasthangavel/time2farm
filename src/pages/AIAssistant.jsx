@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Header from '../components/Header';
 import Card from '../components/Card';
 import Button from '../components/Button';
+import FormattedText from '../components/FormattedText';
 import { aiAPI } from '../api/client';
 import { Bot, BookOpen, Lightbulb, ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -56,7 +57,9 @@ const AIAssistant = () => {
                     <h3 style={{ fontSize: '1rem', fontWeight: '600', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <BookOpen size={18} color="var(--accent-orange)" /> Financial Summary
                     </h3>
-                    <div style={{ fontSize: '0.9rem', lineHeight: '1.5' }} dangerouslySetInnerHTML={{ __html: summary.summary }} />
+                    <div style={{ fontSize: '0.9rem', lineHeight: '1.5' }}>
+                        <FormattedText text={summary.summary} />
+                    </div>
 
                     {summary.insights && summary.insights.length > 0 && (
                         <div style={{ marginTop: '1.5rem' }}>

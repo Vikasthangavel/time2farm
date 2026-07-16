@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { aiAPI } from '../api/client';
 import { Bot, X, Send, MessageCircle } from 'lucide-react';
+import FormattedText from './FormattedText';
 
 const ChatWidget = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -189,7 +190,7 @@ const ChatWidget = () => {
                                 fontSize: '0.85rem',
                                 lineHeight: 1.5,
                             }}>
-                                <div dangerouslySetInnerHTML={{ __html: m.text.replace(/\n/g, '<br/>') }} />
+                                <FormattedText text={m.text} isUser={m.role === 'user' || m.role === 'error'} />
                             </div>
                         ))}
                         {isTyping && (
