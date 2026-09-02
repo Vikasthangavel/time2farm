@@ -339,9 +339,12 @@ const AdminDashboard = () => {
               </div>
             </section>
 
-            {/* Recent Sign-ups */}
+            {/* All Users */}
             <section style={{ marginBottom: '2rem' }}>
-              <h2 style={{ fontSize: '0.75rem', fontWeight: 600, color: '#637560', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.875rem' }}>Recent Sign-ups</h2>
+              <h2 style={{ fontSize: '0.75rem', fontWeight: 600, color: '#637560', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: '0.875rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                All Users
+                <span style={{ background: '#4a9e3f', color: '#fff', fontSize: '0.65rem', fontWeight: 700, padding: '0.1rem 0.5rem', borderRadius: 20 }}>{recentUsers.length}</span>
+              </h2>
               <div style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px rgba(0,0,0,0.06)', overflow: 'hidden' }}>
                 <div style={{ overflowX: 'auto' }}>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.85rem' }}>
