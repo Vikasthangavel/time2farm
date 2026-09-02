@@ -21,6 +21,7 @@ import Calendar from './pages/Calendar';
 import DeleteAccountPublic from './pages/DeleteAccountPublic';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
+import AdminDashboard from './pages/AdminDashboard';
 
 // Protected Route Wrapper
 const ProtectedRoute = ({ children }) => {
@@ -45,6 +46,7 @@ function AppRoutes() {
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/time2farm-admin" element={<AdminDashboard />} />
       <Route path="/delete-account" element={<DeleteAccountPublic />} />
       <Route path="/privacy-policy" element={<PrivacyPolicy />} />
       <Route path="/terms-and-conditions" element={<TermsAndConditions />} />

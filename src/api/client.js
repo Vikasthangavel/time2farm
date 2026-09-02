@@ -282,4 +282,29 @@ export const reportsAPI = {
     }
 };
 
+export const ADMIN_PW_KEY = 'time2farm.admin.pw';
+
+export const adminAPI = {
+    verify: async (password) => {
+        const response = await apiClient.post('/admin/verify', { password });
+        if (response.data.success) {
+            // Cache for stateless header fallback
+            localStorage.setItem(ADMIN_PW_KEY, password);
+        }
+        return response.data;
+    },
+    getOverview: async () => {
+        const pw = localStorage.getItem(ADMIN_PW_KEY) || '';
+        const response = await apiClient.get('/admin/overview', {
+            headers: { 'X-Admin-Auth': pw },
+        });
+        return response.data;
+    },
+    logout: async () => {
+        const response = await apiClient.post('/admin/logout');
+        localStorage.removeItem(ADMIN_PW_KEY);
+        return response.data;
+    },
+};
+
 export default apiClient;
